@@ -5,7 +5,8 @@ window.onload = function() {
   window.ui = SwaggerUIBundle({
     urls: [
       { url: "./manage_rate_plan_10_35.yaml", name: "Manage Rate Plan" },
-      { url: "./shshotelavailabilityv1_1.yaml", name: "Hotel Availability" }
+      { url: "./shshotelavailabilityv1_1.yaml", name: "Hotel Availability" },
+      { url: "./hotelcontentv1_0.yaml", name: "Hotel Content" }
     ],
     dom_id: '#swagger-ui',
     deepLinking: true,

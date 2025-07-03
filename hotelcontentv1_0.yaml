@@ -1,0 +1,1475 @@
+swagger: '2.0'
+info:
+  description: |
+    The Hotel Content APIs provide several different ways to search for a list of hotels and to retrieve associated static descriptive content.
+  version: 1.0.0
+  title: 'Hotel Content'
+x-lingo-api-type: restful
+x-project-id: hotelcontentv1
+schemes:
+  - https
+host: services-wrr.sab-dev-sh-t1-ni-shrd-7655.dev.sabre-gcp.com
+basePath: /v1/api
+x-basePath: /api/v1.0
+securityDefinitions:
+  oauth2_authentication:
+    type: oauth2
+    tokenUrl: 'https://services-wrr.sab-dev-sh-t1-ni-shrd-7655.dev.sabre-gcp.com/v1/gwauth/token?grant_type=client_credentials&source_ip=127.0.0.1&business_context=WBSVC&user_type=Hotel'
+    flow: application
+    x-base64-encode-client-credentials: true
+security:
+  -
+    oauth2_authentication: []
+produces:
+  - application/json
+tags:
+  -
+    name: Content
+    description: 'The Hotel Content API is designed to retrieve static hotel descriptive content.'
+paths:
+  /hotel/list:
+    get:
+      tags:
+        - Content
+      summary: 'Returns static descriptive content for one or more hotels'
+      description: |
+        Returns a list of hotels and requested descriptive content.  There are several ways to search for hotels, but the request should only contain one of these methods.
+        * **Address** - city, state, postal code, country
+        * **Destination** - destination id that is defined in SynXis Control Center
+        * **Id** - one or more hotel ids
+        * **Amenity** - standalone search method or used in combination with any of the above options
+      operationId: hotelList
+      produces:
+        - application/json
+      parameters:
+        -
+          name: Content-Type
+          in: header
+          description: 'Indicates the media type of the resource.'
+          type: string
+          default: application/json
+        -
+          name: Accept-Language
+          in: header
+          description: 'Language code with an optional culture code (i.e. en-US).'
+          required: false
+          type: string
+          x-example: en-US
+        -
+          name: Context
+          in: header
+          description: 'Business Context for the caller.'
+          type: string
+          x-example: WBSVC
+        -
+          name: ActivityId
+          in: header
+          description: 'Unique Id per request for system tracing.'
+          required: false
+          type: string
+          x-example: 76597df-982353a-76ps-59938571
+        -
+          name: brandId
+          in: query
+          type: number
+          description: 'Unique number identifies a specific brand in SynXis CR.'
+        -
+          name: chainId
+          in: query
+          type: integer
+          x-example: 12723
+          description: 'Unique ID that identifies a hotel chain or management group in SynXis.'
+          required: true
+        -
+          name: id
+          in: query
+          description: 'Hotel id that uniquely identifies a single hotel property in SynXis CR.'
+          required: true
+          x-example:
+            - 13098
+            - 16099
+          type: array
+          items:
+            type: integer
+        -
+          name: addressCity
+          in: query
+          type: string
+          description: "City associated with a hotel address.  Use '%' as a wildcard."
+          x-example: Denver
+        -
+          name: addressState
+          in: query
+          type: string
+          description: 'Code of a state or province associated with an address. ISO State/Prov code.'
+          x-example: CO
+        -
+          name: addressPostalCode
+          in: query
+          type: string
+          description: "Postal code associated with a hotel address.  Use '%' as a wildcard."
+          x-example: '80222'
+        -
+          name: Country
+          in: query
+          type: string
+          description: 'Country of the address (ISO Alpha-2 letter alpha country code).'
+          x-example: US
+        -
+          name: amenityList
+          in: query
+          description: 'OTA code indicating the property feature.'
+          x-example:
+            - 101
+            - 102
+          type: array
+          items:
+            type: integer
+        -
+          name: destinationCode
+          in: query
+          type: string
+          description: 'Code associated to a destination in SynXis CR.'
+        -
+          name: destinationId
+          in: query
+          type: integer
+          description: 'Id associated to a destination in SynXis CR.'
+        -
+          name: primaryChannel
+          in: query
+          type: string
+          description: 'SynXis CR booking channel code.'
+          x-example: WEB
+        -
+          name: include
+          in: query
+          description: |
+            Specifies what additional information to include in the response.
+            - `Attributes`: Return a list of attributes for the hotel.
+            - `ChannelProperties`: Returns Channel properties of the hotel. 
+            - `ContactInfo`: Return the contact information for the hotel.
+            - `Currency`: Return the default currency for the hotel.
+            - `DiningOptions`: Return a list of dining options for the hotel.
+            - `Features`: Return a list of property features for the hotel.
+            - `HotelGroups`: Return a list of Chains and Brands associated to the hotel.
+            - `Images`: Return a list of images hotel and room images.
+            - `Languages`: Return a list of languages the hotel supports.
+            - `LocationInfo`: Return address, latitude/longitude and time zone information for the hotel.
+            - `MealPlans`: Return a list of meal plans for the hotel.
+            - `MediaLibraryImages`: Return the library of images.
+            - `Messages`: Return the messages and alerts.
+            - `PaymentMethods`: Return a list of payment methods the hotel supports.
+            - `Recreations`: Return a list of recreation information for the hotel.
+            - `ReferencePoints`: Return a list of reference points near the hotel.
+            - `Services`: Return a list of services for the hotel.
+            - `Tier`: Return the Hotel Tier Definition.
+            - `Transportation`: Return a list of Transportation for the hotel.
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
+            enum:
+              - Attributes
+              - ChannelProperties
+              - ContactInfo
+              - Currency
+              - DiningOptions
+              - Features
+              - HotelGroups
+              - Images
+              - Languages
+              - LocationInfo
+              - MealPlans
+              - MediaLibraryImages
+              - Messages
+              - PaymentMethods
+              - Recreations
+              - ReferencePoints
+              - Services
+              - Tier
+              - Transportation
+        -
+          name: pageStart
+          in: query
+          type: number
+          description: 'Starting record to be returned in the response (used to retrieve data in smaller sets).'
+        -
+          name: pageSize
+          in: query
+          type: number
+          description: 'Number of records to be returned in the response (0 = return max size of 100).'
+      responses:
+        200:
+          description: 'Successful Response.'
+          schema:
+            $ref: '#/definitions/HotelContent'
+        default:
+          description: 'Error Response.'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+  '/hotel/{id}/details':
+    get:
+      tags:
+        - Content
+      summary: 'Returns selected static descriptive content for one hotel.'
+      description: 'Returns selected static descriptive content for one hotel.'
+      operationId: hotelContent
+      produces:
+        - application/json
+      parameters:
+        -
+          name: Content-Type
+          in: header
+          description: 'Indicates the media type of the resource.'
+          type: string
+          default: application/json
+        -
+          name: Accept-Language
+          in: header
+          description: 'Language code with an optional culture code (i.e. en-US).'
+          required: false
+          type: string
+          x-example: en-US
+        -
+          name: Context
+          in: header
+          description: 'Business Context for the caller.'
+          type: string
+          x-example: WBSVC
+        -
+          name: ActivityId
+          in: header
+          description: 'Unique Id per request for system tracing.'
+          required: false
+          type: string
+          x-example: 76597df-982353a-76ps-59938571
+        -
+          name: id
+          in: path
+          type: integer
+          required: true
+          description: 'Id that uniquely identifies a single hotel property in SynXis CR.'
+          x-example: 13098
+        -
+          name: primaryChannel
+          in: query
+          type: string
+          description: 'SynXis CR booking channel code.'
+          x-example: WEB
+        -
+          name: attributeCategory
+          in: query
+          description: |
+            Specify the attribute category.
+            - `GeneralFacilities`: Return a list of attributes assigned to the General Facilities category.
+            - `LocalPolicies`: Return a list of attributes assigned to the Local Policies category.
+            - `Location`: Return a list of attributes assigned to the Location category.
+            - `PhysicallyChallengedFacilities`: Return a list of attributes assigned to the Physically Challenged Facilities category.
+            - `Ratings`: Return a list of attributes assigned to the Ratings category.
+            - `Safety`: Return a list of attributes assigned to the Safety category.
+            - `Settings`: Return a list of attributes assigned to the Settings category.
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
+            enum:
+              - GeneralFacilities
+              - LocalPolicies
+              - Location
+              - PhysicallyChallengedFacilities
+              - Ratings
+              - Safety
+              - Settings
+        -
+          name: include
+          in: query
+          description: |
+            Specifies what additional information to include in the response.
+            - `Attributes`: Return a list of attributes for the hotel.
+            - `ChannelProperties`: Returns Channel properties of the hotel. 
+            - `ContactInfo`: Return the contact information for the hotel.
+            - `Currency`: Return the default currency for the hotel.
+            - `DiningOptions`: Return a list of dining options for the hotel.
+            - `Features`: Return a list of property features for the hotel.
+            - `HotelGroups`: Return a list of Chains and Brands associated to the hotel.
+            - `Images`: Return a list of images hotel and room images.
+            - `Languages`: Return a list of languages the hotel supports.
+            - `LocationInfo`: Return address, latitude/longitude and time zone information for the hotel.
+            - `MealPlans`: Return a list of meal plans for the hotel.
+            - `MediaLibraryImages`: Return the library of images.
+            - `Messages`: Return the messages and alerts.
+            - `PaymentMethods`: Return a list of payment methods the hotel supports.
+            - `Recreations`: Return a list of recreation information for the hotel.
+            - `ReferencePoints`: Return a list of reference points near the hotel.
+            - `Services`: Return a list of services for the hotel.
+            - `Tier`: Return the Hotel Tier Definition.
+            - `Transportation`: Return a list of Transportation for the hotel.
+          type: array
+          collectionFormat: csv
+          items:
+            type: string
+            enum:
+              - Attributes
+              - ChannelProperties
+              - ContactInfo
+              - Currency
+              - DiningOptions
+              - Features
+              - HotelGroups
+              - Images
+              - Languages
+              - LocationInfo
+              - MealPlans
+              - MediaLibraryImages
+              - Messages
+              - PaymentMethods
+              - Recreations
+              - ReferencePoints
+              - Services
+              - Tier
+              - Transportation
+      responses:
+        200:
+          description: 'Successful Response.'
+          schema:
+            $ref: '#/definitions/HotelContent'
+        default:
+          description: 'Error Response.'
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+definitions:
+  Alert:
+    type: object
+    properties:
+      Name:
+        type: string
+        description: 'Name of the alert.'
+        example: 'Pool Closed'
+      Type:
+        description: 'Type of the alert.'
+        $ref: '#/definitions/AlertTypeEnum'
+      Details:
+        description: 'Contains details about the alert.'
+        $ref: '#/definitions/AlertDetails'
+  AlertDetails:
+    type: object
+    description: 'Contains details about the alert.'
+    properties:
+      Description:
+        type: string
+        description: 'Short description of the alert.'
+        example: 'Pool closed due to renovation.'
+      DetailedDescription:
+        type: string
+        description: 'Detailed description of the alert.'
+        example: 'The pool will be closed for renovation.  During this time guests will not have access to it.'
+      Validity:
+        description: 'Contains details about the validity dates of the alert.'
+        $ref: '#/definitions/AlertValidity'
+  AlertTypeEnum:
+    type: string
+    description: 'Type of the alert.'
+    example: Hotel
+    enum:
+      - BookingInfo
+      - Hotel
+      - Marketing
+  AlertValidity:
+    type: object
+    description: 'Contains details about the validity dates of the alert.'
+    properties:
+      End:
+        type: string
+        description: 'End date for which the alert applies.'
+        example: '2024-12-31T00:00:00'
+      Start:
+        type: string
+        description: 'Start date for which the alert applies.'
+        example: '2024-12-01T00:00:00'
+  Attribute:
+    type: object
+    description: 'Contains information about hotel attributes.'
+    properties:
+      Category:
+        description: 'Category code of the attribute.'
+        $ref: '#/definitions/AttributeCategoryEnum'
+      Id:
+        type: integer
+        description: 'SynXis Id of the attribute.'
+        example: 70
+      Name:
+        type: string
+        description: 'Name of the attribute.'
+        example: 'Year Built'
+      Value:
+        type: string
+        description: 'Value of the attribute.'
+        example: '1876'
+      DataType:
+        type: string
+        description: 'Data type associated to the specific attribute.'
+        example: String
+  AttributeCategoryEnum:
+    type: string
+    description: 'Category code of the attribute.'
+    example: GeneralFacilities
+    enum:
+      - GeneralFacilities
+      - LocalPolicies
+      - Location
+      - PhysicallyChallengedFacilities
+      - Ratings
+      - Safety
+      - Settings
+  Brand:
+    type: object
+    description: 'Contains information about a hotel brand.'
+    properties:
+      Code:
+        type: string
+        description: 'Code identifying hotel or chain brand.'
+        example: Brand1
+      Id:
+        type: integer
+        description: 'Unique id that identifies a specific brand in SynXis CR.'
+        example: 246589
+      Name:
+        type: string
+        description: 'Name of a hotel or chain brand.'
+        example: 'SynXis Brand'
+      ChainID:
+        type: integer
+        description: 'ID of the Chain that the brand is associated with.'
+        example: 12723
+  BrandList:
+    type: object
+    description: 'Contains selected brands associated with a hotel.'
+    properties:
+      ID:
+        type: integer
+        description: 'Unique id that identifies a specific brand in SynXis CR.'
+        example: 246589
+      Default:
+        type: boolean
+        description: 'If true, indicates the default brand for the hotel.'
+        example: true
+  Chain:
+    type: object
+    description: 'Contains information about a hotel chain.'
+    properties:
+      Code:
+        type: string
+        description: 'Code that defines a hotel chain or management group in SynXis.'
+        example: MIDINN
+      Id:
+        type: integer
+        description: 'Unique Id that identifies a hotel chain or management group in SynXis CR.'
+        example: 12723
+      Name:
+        type: string
+        description: 'Name of hotel chain.'
+        example: 'SynXis Test Chain'
+  ChainList:
+    type: object
+    description: 'Contains selected chains associated with a hotel.'
+    properties:
+      ID:
+        type: integer
+        description: 'Unique Id that identifies a hotel chain or management group in SynXis CR.'
+        example: 12723
+      Primary:
+        type: boolean
+        description: 'If true, indicates the primary chain for the hotel.'
+        example: true
+  Channel:
+    type: object
+    description: 'Contains information about booking channels allowed by the hotel.'
+    properties:
+      Code:
+        type: string
+        description: 'Booking channel code.'
+        example: EXPDC
+      Name:
+        type: string
+        description: 'Name of the booking channel.'
+        example: Expedia
+      ParentCode:
+        type: string
+        description: 'Parent booking channel code.'
+        example: SYDC
+      Properties:
+        description: 'Contains information related to GDS and IDS channels.'
+        $ref: '#/definitions/ChannelProperties'
+  ChannelProperties:
+    type: object
+    description: 'Contains information related to GDS and IDS channels.'
+    properties:
+      HotelCode:
+        type: string
+        description: 'Channel specific hotel code.'
+        example: YX13098
+      ChainCode:
+        type: string
+        description: 'Channel specific chain code.'
+        example: YX
+      GoLiveDate:
+        type: string
+        description: 'The Go-Live date of the hotel for the channel.'
+        example: '2016-06-08T00:00:00'
+  ContactDetails:
+    type: object
+    description: 'Contains information about the hotel contact.'
+    properties:
+      ContactName:
+        type: string
+        description: 'Name of contact.'
+        example: 'John Smith'
+      ContactNumberList:
+        description: 'Contact phone number.'
+        type: array
+        items:
+          $ref: '#/definitions/ContactNumber'
+      EmailAddress:
+        type: string
+        description: 'Email address for contact.'
+        example: jSmith@email.com
+      Website:
+        type: string
+        description: 'Website URL for the hotel.'
+        example: www.somehotel.com
+  ContactNumber:
+    type: object
+    description: 'Contact phone number.'
+    properties:
+      Number:
+        type: string
+        description: 'Phone number for contact.'
+        example: 555-123-4567
+      Type:
+        description: 'Indicates type of contact number.'
+        $ref: '#/definitions/ContactNumberTypeEnum'
+  ContactNumberTypeEnum:
+    type: string
+    description: 'Indicates type of contact number.'
+    example: Home
+    enum:
+      - Home
+      - Office
+      - Mobile
+  Content:
+    type: object
+    description: 'Contains detailed information across several categories.'
+    properties:
+      brandList:
+        type: array
+        description: 'Contains information about a hotel brand.'
+        items:
+          $ref: '#/definitions/Brand'
+      chainList:
+        type: array
+        description: 'Contains information about a hotel chain.'
+        items:
+          $ref: '#/definitions/Chain'
+      croList:
+        type: array
+        description: 'Contains information about a hotel Central Reservation Office (CRO).'
+        items:
+          $ref: '#/definitions/Cro'
+      currencyList:
+        type: array
+        description: 'Contains detailed information about currencies.'
+        items:
+          $ref: '#/definitions/CurrencyDetails'
+      destinationList:
+        type: array
+        description: 'Contains information about a destination.'
+        items:
+          $ref: '#/definitions/Destination'
+      languageList:
+        type: array
+        description: 'Contains detailed information about a language.'
+        items:
+          $ref: '#/definitions/LanguageDetails'
+      paymentMethodList:
+        type: array
+        description: 'Contains detailed information about a payment method.'
+        items:
+          $ref: '#/definitions/PaymentMethodDetails'
+  Cro:
+    type: object
+    description: 'Contains information about a hotel Central Reservation Office (CRO).'
+    properties:
+      Id:
+        type: integer
+        description: 'Unique id that identifies a specific CRO in SynXis CR.'
+        example: 14160760
+      Name:
+        type: string
+        description: 'Name of a CRO.'
+        example: 'Southwest Hotels'
+      Chain:
+        type: object
+        properties:
+          Id:
+            type: integer
+            description: 'ID of the Chain that the CRO is associated with.'
+            example: 12723
+  CroList:
+    type: object
+    description: 'Contains selected CROs associated with a hotel.'
+    properties:
+      Id:
+        type: integer
+        description: 'Unique Id that identifies a CRO or management group in SynXis CR.'
+        example: 246579
+  Currency:
+    type: object
+    description: 'Contains information about a currency.'
+    properties:
+      Code:
+        type: string
+        description: 'ISO 4217 three alpha currency code.'
+        example: USD
+      Name:
+        type: string
+        description: 'Name of the currency.'
+        example: 'US Dollars'
+      Default:
+        type: boolean
+        description: 'If true, indicates the default currency of the hotel.'
+        example: true
+  CurrencyDetails:
+    type: object
+    description: 'Contains detailed information about a currency.'
+    properties:
+      CurrencyCode:
+        type: string
+        description: 'ISO 4217 three alpha currency code.'
+        example: USD
+      DecimalPlaces:
+        type: integer
+        description: 'Number of decimals supported by the currency.'
+        example: 2
+      Name:
+        type: string
+        description: 'Name of the currency.'
+        example: 'US Dollars'
+      RateOfExchange:
+        type: string
+        description: 'Rate of exchange for the currency.'
+        example: USD
+      Symbol:
+        type: string
+        description: 'Symbol of the currency.'
+        example: $
+  Description:
+    type: object
+    description: 'Contains descriptive information about a hotel.'
+    properties:
+      Name:
+        type: string
+        description: 'Name related to the description.'
+        example: GeneralPolicies
+      Description:
+        type: string
+        description: 'Detailed description.'
+        example: 'Check-out time - 1200'
+  Destination:
+    type: object
+    description: 'Contains information about a destination.'
+    properties:
+      Id:
+        type: integer
+        description: 'Unique id that identifies a specific Destination in SynXis CR.'
+        example: 14160859
+      Code:
+        type: string
+        description: 'Code of a destination.'
+        example: SWUS
+      Name:
+        type: string
+        description: 'Name of a destination.'
+        example: 'South West US'
+  DestinationList:
+    type: object
+    description: 'Contains selected destinations associated with a hotel.'
+    properties:
+      Id:
+        type: integer
+        description: 'Unique id that identifies a specific Destination in SynXis CR.'
+        example: 14160859
+  DiningOptions:
+    type: object
+    description: 'Contains information about a dining options located at or near the hotel.'
+    properties:
+      Description:
+        type: string
+        description: 'Description of the dining option.'
+        example: 'Chinese Cuisine'
+      Name:
+        type: string
+        description: 'Name of the dining option.'
+        example: 'China House'
+      OnProperty:
+        type: boolean
+        description: 'If true, indicates the dining option is located at the hotel.'
+        example: true
+      SmokingPermitted:
+        type: boolean
+        description: 'If true, indicates that smoking is permitted.'
+        example: false
+      Distance:
+        type: string
+        description: 'Distance from the hotel to the dining option location.'
+        example: '0'
+      Meal:
+        description: 'Contains information about meals a dining option supports.'
+        $ref: '#/definitions/DiningOptionsMeal'
+      Category:
+        type: array
+        description: 'Contains information about a dining option category.'
+        items:
+          $ref: '#/definitions/DiningOptionsCategory'
+      SortOrder:
+        type: integer
+        description: 'Indicates the Sort Order of the dining option.'
+        example: 1
+  DiningOptionsCategory:
+    description: 'Contains information about a dining option category.'
+    type: object
+    properties:
+      OtaCode:
+        type: string
+        description: 'OTA code of the dining option.'
+        example: '13'
+      OtaType:
+        type: string
+        description: 'OTA code category type.'
+        example: RES
+      OtaDescription:
+        type: string
+        description: 'Name of the OTA restaurant category.'
+        example: Bar/lounge
+  DiningOptionsMeal:
+    description: 'Contains information about meals a dining option supports.'
+    type: object
+    properties:
+      Breakfast:
+        type: boolean
+        description: 'If true, indicates that Breakfast is served.'
+        example: false
+      Brunch:
+        type: boolean
+        description: 'If true, indicates that Brunch is served.'
+        example: false
+      Dinner:
+        type: boolean
+        description: 'If true, indicates that Dinner is served.'
+        example: true
+      Lunch:
+        type: boolean
+        description: 'If true, indicates that Lunch is served.'
+        example: true
+  HotelActiveDates:
+    type: object
+    description: 'Contains that active start and end dates of a hotel in the SynXis CR.'
+    properties:
+      StartDate:
+        type: string
+        format: date
+        description: 'Beginning date that the hotel is active (format yyyy-mm-dd).'
+        example: '2007-05-18'
+      EndDate:
+        type: string
+        format: date
+        description: 'Date the hotel was terminated from the SynXis CR (format yyyy-mm-dd).'
+        example: '2027-05-18'
+  HotelContent:
+    type: object
+    description: 'Successful Response object containing hotel and related content information.'
+    properties:
+      contentLists:
+        description: 'Contains detailed information across several categories.'
+        $ref: '#/definitions/Content'
+      hotelList:
+        description: 'Contains information associated with a hotel.'
+        items:
+          $ref: '#/definitions/HotelList'
+      Paging:
+        description: 'Contains information about the number of records in the response.'
+        $ref: '#/definitions/Paging'
+  HotelList:
+    description: 'Contains information associated with a hotel.'
+    type: object
+    properties:
+      ID:
+        type: integer
+        description: 'Id that uniquely identifies a single hotel property in SynXis CR.'
+        example: 13098
+      Code:
+        type: string
+        description: 'Code identifying a specific hotel.'
+        example: SYNX
+      Name:
+        type: string
+        description: 'Name of the hotel.'
+        example: 'SynXis Hotel'
+      PmsCode:
+        type: string
+        description: 'Code identifying a specific hotel.'
+        example: SYNX1
+      ShortName:
+        type: string
+        description: 'Name of the hotel.'
+        example: 'SynXis Hotel'
+      ActiveDate:
+        description: 'Contains that active start and end dates of a hotel in the SynXis CR.'
+        $ref: '#/definitions/HotelActiveDates'
+      AlertList:
+        type: array
+        description: 'Contains information about hotel alerts.'
+        items:
+          $ref: '#/definitions/Alert'
+      Attributes:
+        type: array
+        description: 'Contains information about hotel attributes.'
+        items:
+          $ref: '#/definitions/Attribute'
+      MealPlanList:
+        type: array
+        description: 'Contains information about meal plans.'
+        items:
+          $ref: '#/definitions/MealPlan'
+      BrandList:
+        description: 'Contains selected brands associated with a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/BrandList'
+      ChainList:
+        description: 'Contains selected chains associated with a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/ChainList'
+      ContactDetails:
+        description: 'Contains information about the hotel contact.'
+        $ref: '#/definitions/ContactDetails'
+      Channels:
+        type: array
+        description: 'Contains information about booking channels allowed by the hotel.'
+        items:
+          $ref: '#/definitions/Channel'
+      CROList:
+        description: 'Contains selected CROs associated with a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/CroList'
+      Currency:
+        description: 'Contains information about a currency.'
+        $ref: '#/definitions/Currency'
+      DestinationList:
+        description: 'Contains selected destinations associated with a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/DestinationList'
+      DiningOptionList:
+        description: 'Contains information about dining options located at or near the hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/DiningOptions'
+      Descriptions:
+        description: 'Contains hotel descriptions.'
+        type: array
+        items:
+          $ref: '#/definitions/Description'
+      PropertyFeatures:
+        type: array
+        description: 'Contains information about property features associated with a hotel.'
+        items:
+          $ref: '#/definitions/PropertyFeatures'
+      ImageList:
+        description: 'Contains information about images.'
+        type: array
+        items:
+          $ref: '#/definitions/Images'
+      LanguageList:
+        description: 'Contains information about languages supported by a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/Language'
+      Location:
+        description: 'Contains information about a hotel location.'
+        $ref: '#/definitions/Location'
+      PaymentMethodList:
+        description: 'Contains information about payment methods supported by a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/PaymentMethodList'
+      RecreationList:
+        description: 'Contains recreation information located on or near a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/RecreationList'
+      ReferencePointList:
+        description: 'Contains point of interest information located near a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/ReferencePointList'
+      RelativeLocation:
+        description: 'Identifies the location of the original hotel if an alternate hotel was selected.'
+        type: object
+        properties:
+          OriginalHotel:
+            description: 'Contains the hotel id of the original hotel if an alternate hotel was selected.'
+            type: array
+            items:
+              $ref: '#/definitions/OriginalHotel'
+      ServiceList:
+        description: 'Contains information about services offered at a hotel.'
+        type: array
+        items:
+          $ref: '#/definitions/ServiceList'
+      TerminalList:
+        description: 'Contains information about transportation terminals.'
+        type: array
+        items:
+          $ref: '#/definitions/TerminalList'
+      Status:
+        description: 'Status of the hotel.'
+        $ref: '#/definitions/HotelStatusEnum'
+  HotelStatusEnum:
+    type: string
+    description: 'Status of the hotel.'
+    example: Open
+    enum:
+      - Open
+      - Inactive
+      - Suspended
+      - Terminated
+  Images:
+    type: object
+    description: 'Contains information about images.'
+    properties:
+      Caption:
+        type: string
+        description: 'Caption of the image.'
+        example: 'Ocean View'
+      Path:
+        type: string
+        description: 'Path of the image file.'
+        example: 'https://hotel.cloudfront.net/imageRepo/1/OceanView.jpg'
+      SortOrder:
+        type: integer
+        description: 'Specifies the sequence in which the search results are displayed.'
+        example: 1
+      MediaType:
+        description: 'Media type of the image.'
+        $ref: '#/definitions/MediaTypeEnum'
+      MediaCategory:
+        description: 'Media Category of the image.'
+        $ref: '#/definitions/MediaCategoryEnum'
+  Language:
+    type: object
+    description: 'Contains information about languages supported by a hotel.'
+    properties:
+      Code:
+        type: string
+        description: 'Language code with an optional culture code.'
+        example: en-US
+      Default:
+        type: boolean
+        description: 'If true, indicates the default language for the hotel.'
+        example: true
+      Primary:
+        type: boolean
+        description: 'If true, indicates the primary language for the hotel.'
+        example: true
+  LanguageDetails:
+    type: object
+    description: 'Contains detailed information about a language.'
+    properties:
+      Code:
+        type: string
+        description: 'Language code with an optional culture code.'
+        example: ja-JP
+      Name:
+        type: string
+        description: 'Name of the language.'
+        example: Japanese
+      NativeName:
+        type: string
+        description: 'Native Name for the language.'
+        example: 日本語
+  Location:
+    type: object
+    description: 'Contains information about a hotel location.'
+    properties:
+      Address:
+        description: 'Contains Address information.'
+        $ref: '#/definitions/LocationAddress'
+      Latitude:
+        type: string
+        description: 'Latitude coordinate for the location of the hotel.'
+        example: '32.9502'
+      Longitude:
+        type: string
+        description: 'Longitude coordinate for the location of the hotel.'
+        example: '-97.1493'
+      TimeZone:
+        type: string
+        description: 'Time zone UTC in which the hotel is located.'
+        example: '-6'
+      Type:
+        description: 'Hotel Location Type.'
+        $ref: '#/definitions/LocationTypeEnum'
+  LocationAddress:
+    type: object
+    description: 'Contains Address information.'
+    properties:
+      AddressLine:
+        description: 'Street-related information associated with the hotel.'
+        $ref: '#/definitions/LocationAddressLine'
+      City:
+        type: string
+        description: 'City where the hotel is located.'
+        example: Southlake
+      CountryName:
+        description: 'Contains information about a Country.'
+        $ref: '#/definitions/LocationCountryName'
+      PostalCode:
+        type: string
+        description: 'Postal code for the hotel.'
+        example: '76092'
+      StateProv:
+        description: 'Contains information about a State or Province.'
+        $ref: '#/definitions/LocationStateProv'
+  LocationAddressLine:
+    type: array
+    items:
+      type: string
+      description: 'Street-related information associated with the hotel.'
+      minItems: 0
+      maxItems: 3
+      example: '3150 Sabre Dr'
+  LocationCountryName:
+    type: object
+    description: 'Contains information about a Country.'
+    properties:
+      Code:
+        type: string
+        description: 'Country code where the hotel is located.  ISO alpha-2 letter code.'
+        example: US
+      Value:
+        type: string
+        description: 'Name of the country where the hotel is located.'
+        example: 'United States'
+  LocationStateProv:
+    type: object
+    properties:
+      Code:
+        type: string
+        description: 'State or Province where the hotel is located.  ISO state/prov code.'
+        example: TX
+      Value:
+        type: string
+        description: 'Name of the State or Province where the hotel is located.'
+        example: Texas
+  LocationTypeEnum:
+    type: string
+    description: 'Hotel Location Type.'
+    example: Airport
+    enum:
+      - None
+      - Airport
+      - CityCenter
+      - Resort
+      - Rural
+      - Suburban
+  MealPlan:
+    type: object
+    description: 'Contains information about meal plans.'
+    properties:
+      Name:
+        type: string
+        description: 'Name of meal plan.'
+        example: 'Bed & Breakfast'
+      Type:
+        description: 'Type of meal plan.'
+        $ref: '#/definitions/MealPlanTypeEnum'
+      Chargeable:
+        type: boolean
+        description: 'If true, indicates there is a charge for the meal plan.'
+        example: true
+      Description:
+        type: string
+        description: 'Detailed meal plan description.'
+        example: 'Breakfast included in all rates. Buffet Breakfast is served in the main restaurant between 6-10 am.'
+  MealPlanTypeEnum:
+    type: string
+    description: 'Type of meal plan.'
+    example: 'All Inclusive -AI'
+    enum:
+      - 'All Inclusive -AI'
+      - 'American/ Full Board -AP'
+      - 'Bed and Breakfast - BB'
+      - 'Bermuda - BP'
+      - 'Breakfast - BK'
+      - 'Buffet Breakfast - BF'
+      - 'Caribbean Plan - CB'
+      - 'Continental - CP'
+      - 'Dinner Bed and Breakfast - DB'
+      - 'English Breakfast - EB'
+      - 'European - EP'
+      - 'Family - FP'
+      - 'Family American - FA'
+      - 'Full Breakfast - FB'
+      - 'Modified American / Half Board - MA'
+  MediaCategoryEnum:
+    type: string
+    description: 'Media Category of the image.'
+    example: Banner
+    enum:
+      - Banner
+      - BrandRate
+      - BrandRoom
+      - ChainRate
+      - ChainRoom
+      - Group
+      - None
+      - Package
+      - Promotion
+      - Rate
+      - Room
+  MediaTypeEnum:
+    type: string
+    description: 'Media type of the image.'
+    example: CRS
+    enum:
+      - Unknown
+      - CRS
+      - VScape
+      - 'ICE Portal'
+  OriginalHotel:
+    description: 'Contains the hotel id of the original hotel if an alternate hotel was selected.'
+    type: object
+    properties:
+      Id:
+        description: 'Hotel id that uniquely identifies a single hotel property in SynXis CR.'
+        type: integer
+        example: 12534
+  Paging:
+    type: object
+    description: 'Contains information about the number of records in the response.'
+    properties:
+      Size:
+        type: integer
+        description: 'Number of records returned in the response.'
+        example: 50
+      Start:
+        type: integer
+        description: 'Starting record returned in the response.'
+        example: 0
+      Total:
+        type: integer
+        example: 146
+        description: 'Total number of records.'
+  PaymentMethodList:
+    type: object
+    description: 'Contains information about payment methods supported by a hotel.'
+    properties:
+      Code:
+        description: 'Standard code for the payment.'
+        $ref: '#/definitions/PaymentMethodTypeEnum'
+      Deposit:
+        type: boolean
+        description: 'If true, indicates the payment type is accepted for a deposit.'
+        example: true
+      Guarantee:
+        type: boolean
+        description: 'If true, indicates the payment type is accepted for a guarantee.'
+        example: true
+      InUse:
+        type: boolean
+        description: 'If true, indicates the payment type is active and in use by the hotel.'
+        example: true
+  PaymentMethodDetails:
+    type: object
+    description: 'Contains detailed information about a payment method.'
+    properties:
+      Code:
+        description: 'Standard code for the payment.'
+        $ref: '#/definitions/PaymentMethodTypeEnum'
+      Name:
+        type: string
+        description: 'Name of the payment type.'
+        example: 'American Express'
+      Type:
+        description: 'Type of the payment method.'
+        $ref: '#/definitions/PaymentMethodTypeEnum'
+      Category:
+        type: string
+        description: 'Payment method category.'
+        example: 'Credit Card'
+  PaymentMethodTypeEnum:
+    type: string
+    description: 'Type of the payment method.'
+    example: AX
+    enum:
+      - AL
+      - ATMDC
+      - AX
+      - BA
+      - BO
+      - CB
+      - CC
+      - CH
+      - CK
+      - DB
+      - DC
+      - DK
+      - DS
+      - ER
+      - EU
+      - FB
+      - GW
+      - HI
+      - ID
+      - IP
+      - JC
+      - KB
+      - LPC
+      - LPP
+      - MA
+      - MC
+      - MD
+      - NB
+      - PP
+      - TA
+      - TP
+      - UP
+      - UPE
+      - Unknown
+      - VI
+      - WA
+      - WC
+      - XS
+  PropertyFeatures:
+    type: object
+    description: 'Contains information about a property feature associated with a hotel.'
+    properties:
+      Code:
+        type: string
+        description: 'Code indicating the property feature.'
+        example: '20514'
+      Description:
+        type: string
+        description: 'Description of the property feature.'
+        example: 'Car Rental Desk'
+      OtaCode:
+        type: string
+        description: 'OTA code indicating the property feature.'
+        example: '15'
+      OtaDescription:
+        type: string
+        description: 'OTA description of the property feature.'
+        example: 'Car Rental Desk'
+      OtaType:
+        type: string
+        description: 'OTA code category type.'
+        example: HTA
+  RecreationList:
+    type: object
+    description: 'Contains recreation information located on or near a hotel.'
+    properties:
+      Type:
+        type: string
+        description: 'Type of recreation.'
+        example: 'Antique shopping'
+      OnProperty:
+        type: boolean
+        description: 'If true, indicates that recreation type is on property.'
+        example: false
+      Distance:
+        type: number
+        description: 'Distance from the hotel to the recreation location.'
+        example: 5
+      Note:
+        type: string
+        description: 'Additional information about recreation.'
+        example: "Let's go shopping!"
+      OtaCode:
+        type: string
+        description: 'OTA code indicating the recreation type (HAC, REC or RST).'
+        example: '152'
+      OtaDescription:
+        type: string
+        description: 'OTA description of the recreation.'
+        example: 'Antique shopping'
+      OtaType:
+        type: string
+        description: 'OTA code category type.'
+        example: RST
+  ReferencePointList:
+    type: object
+    description: 'Contains point of interest information located near a hotel.'
+    properties:
+      Name:
+        type: string
+        description: 'Name of the reference point.'
+        example: 'Pikes Peak'
+      Type:
+        description: 'Indicates kind of reference point.'
+        $ref: '#/definitions/ReferenceTypeEnum'
+      Direction:
+        description: 'Direction from the reference point to property.'
+        $ref: '#/definitions/ReferenceDirectionEnum'
+      Distance:
+        type: number
+        description: 'Distance from reference point to property.'
+        example: 600
+      UnitOfMeasure:
+        description: 'Unit of measurement.'
+        $ref: '#/definitions/UnitOfMeasureEnum'
+  ReferenceDirectionEnum:
+    type: string
+    description: 'Direction from the reference point to property.'
+    example: NW
+    enum:
+      - E
+      - 'N'
+      - NE
+      - NW
+      - S
+      - SE
+      - SW
+      - W
+  ReferenceTypeEnum:
+    type: string
+    description: 'Indicates kind of reference point.'
+    example: Attraction
+    enum:
+      - Attraction
+      - Business
+  ServiceList:
+    type: object
+    description: 'Contains information about services offered at a hotel.'
+    properties:
+      OnProperty:
+        type: boolean
+        description: 'If true, indicates the service is located on the hotel property.'
+        example: true
+      Note:
+        type: string
+        description: 'Brief description of the service or more details regarding charges, as needed.'
+        example: 'Open 8am until midnight.'
+      Type:
+        description: 'Contains information about the Service.'
+        $ref: '#/definitions/ServiceListType'
+  ServiceListType:
+    type: object
+    properties:
+      Id:
+        type: integer
+        description: 'Id of the service.'
+        example: 39
+      Code:
+        type: string
+        description: 'HAC and BUS OTA Service code value.'
+        example: BUS
+      Name:
+        type: string
+        description: 'Name of the service amenity.'
+        example: 'Business Center'
+  TerminalList:
+    type: object
+    description: 'Contains information about transportation terminals.'
+    properties:
+      Code:
+        type: string
+        description: 'Indicates the Terminal Code.'
+        example: DFW
+      Type:
+        description: 'Indicates the terminal type.'
+        $ref: '#/definitions/TerminalTypeEnum'
+      TransportationList:
+        description: 'Contains information about modes of transportation.'
+        type: array
+        items:
+          $ref: '#/definitions/Transportation'
+  TerminalTypeEnum:
+    type: string
+    example: Airport
+    description: 'Indicates the terminal type.'
+    enum:
+      - Airport
+      - Boatdock
+      - BusTerminal
+      - TrainStation
+      - Unknown
+  Transportation:
+    type: object
+    description: 'Contains information about modes of transportation.'
+    properties:
+      transportationCode:
+        type: string
+        description: 'Indicates the Transportation Code.'
+        example: Bus
+      TransportationMethod:
+        description: 'Indicates the Transportation Method.'
+        $ref: '#/definitions/TransportationMethodEnum'
+      OneWay:
+        type: boolean
+        description: 'If true, indicates that the transportation method is a one-way trip.'
+        example: false
+      ArrangeableByHotel:
+        type: boolean
+        description: 'If true, indicates that the hotel can arrange the transportation.'
+        example: true
+      Description:
+        type: string
+        description: 'Description of the transportation method.'
+        example: 'Bus To/From DFW Airport'
+  TransportationMethodEnum:
+    type: string
+    description: 'Indicates the Transportation Method.'
+    example: Bus
+    enum:
+      - Alternate
+      - Boat
+      - Bus
+      - CarRental
+      - Limo
+      - MetroSubway
+      - Other
+      - Shuttle
+      - Taxi
+      - Train
+  UnitOfMeasureEnum:
+    type: string
+    description: 'Unit of measurement.'
+    example: Miles
+    enum:
+      - None
+      - Centimeters
+      - Feet
+      - Inches
+      - Kilometers
+      - Meters
+      - Miles
+      - Milimeters
+      - Yards
+  ErrorResponse:
+    properties:
+      ErrorCode:
+        type: string
+        example: 'Error Code'
+        description: 'Returns an Application-specific code associated with the error.'
+      Message:
+        type: string
+        example: InvalidChain
+        description: 'Returns an Application-specific message associated with the error.'
+      TimeStamp:
+        type: string
+        format: date-time
+        example: '2022-07-09T16:00:00Z'
+        description: 'Timestamp when the message was processed.'
