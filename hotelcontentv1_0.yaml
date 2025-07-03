@@ -2,6 +2,25 @@ swagger: '2.0'
 info:
   description: |
     The Hotel Content APIs provide several different ways to search for a list of hotels and to retrieve associated static descriptive content.
+    |
+    ## Overview of the Payment Processing API
+
+    This API allows you to securely process payments, manage transactions, and
+    retrieve payment-related data. Our payment gateway ensures high security
+    standards and compliance.
+
+    **Key Features:**
+    * Create and manage payments
+    * Handle refunds and disputes
+    * Retrieve transaction history
+
+    <div style="background-color: #e6f7ff; border-left: 5px solid #0056b3; padding: 10px; margin-top: 20px;">
+        **Important Note:** All API calls require authentication using an API key.
+        Please refer to the <a href="#/Authentication">Authentication</a> section for details.
+    </div>
+
+    If you have any questions, please contact our support team.
+
   version: 1.0.0
   title: 'Hotel Content'
 x-lingo-api-type: restful
