@@ -1,0 +1,2262 @@
+swagger: '2.0'
+info:
+  description: 'The Hotel Availability API returns detailed availability and pricing information for a single hotel.'
+  version: '1.0'
+  title: 'Hotel Availability'
+x-project-id: shshotelavailabilityv1
+schemes:
+  - https
+host: services-wrr.sab-dev-sh-t1-ni-shrd-7655.dev.sabre-gcp.com
+basePath: /v1/api/hotel/
+x-basePath: /api/v1.0/hotel/
+securityDefinitions:
+  oauth2_authentication:
+    type: oauth2
+    tokenUrl: 'https://services-wrr.sab-dev-sh-t1-ni-shrd-7655.dev.sabre-gcp.com/v1/gwauth/token?grant_type=client_credentials&source_ip=127.0.0.1&business_context=WBSVC&user_type=Hotel'
+    flow: application
+    x-base64-encode-client-credentials: true
+security:
+  -
+    oauth2_authentication: []
+paths:
+  /availability:
+    get:
+      tags:
+        - Search
+      summary: 'Hotel Pricing and Availability'
+      operationId: hotelShop
+      description: |
+        This message provides the ability to search a single hotel for detailed availability and pricing information.
+      produces:
+        - application/json
+      parameters:
+        -
+          name: Content-Type
+          in: header
+          description: 'Indicates the media type of the resource.'
+          type: string
+          default: application/json
+        -
+          name: Accept-Language
+          in: header
+          description: 'Language code with an optional culture code.  Used to request content in the specified language (i.e. en-US)'
+          required: false
+          type: string
+        -
+          name: Context
+          in: header
+          description: 'Business Context for the caller'
+          required: false
+          type: string
+        -
+          name: ActivityId
+          in: header
+          description: 'Unique Id per request for system tracing'
+          required: false
+          type: string
+        -
+          name: accessCode
+          in: query
+          type: string
+          description: 'Access code to use in the search'
+        -
+          name: accessFilterCorporateRates
+          in: query
+          type: boolean
+          description: 'If true, the system will filter the results to only include Preferred and Required Company rates when available.  Only applicable when ```@accessType=corporate```.'
+        -
+          name: accessType
+          in: query
+          type: string
+          description: 'Access code type'
+          items:
+            type: string
+            enum:
+              - group
+              - promotion
+              - corporate
+              - channelAccessCode
+        -
+          name: accessLatitude
+          in: query
+          type: number
+          description: 'Latitude used to search for Geo promotions. Only applies when ```@accessType=promotion```.'
+        -
+          name: accessLongitude
+          in: query
+          type: number
+          description: 'Longitude used to search for Geo promotions. Only applies when ```@accessType=promotion```.'
+        -
+          name: adults
+          in: query
+          type: integer
+          required: true
+          description: 'Number of adults staying in the room'
+        -
+          name: children
+          in: query
+          type: integer
+          description: 'Number of children staying in the room'
+        -
+          name: childrenAge
+          in: query
+          description: 'Ages of children'
+          type: array
+          items:
+            type: integer
+        -
+          name: additionalAdults
+          in: query
+          description: 'Specifies additional adult counts for pricing.  2 Adults and 2 additionalAdults will result in pricing for 2, 3 and 4 adults in the response.'
+          type: array
+          items:
+            type: integer
+        -
+          name: additionalChildren
+          in: query
+          description: 'Specifies additional children counts for pricing.  2 Children and 1 additionalChildren will result in pricing for 2, 3 children in the response.'
+          type: array
+          items:
+            type: integer
+        -
+          name: agentId
+          in: query
+          type: string
+          description: 'Id associated with the agent type'
+        -
+          name: agentType
+          in: query
+          type: string
+          description: 'Agent type'
+          enum:
+            - Booker
+            - IATA
+            - ChainAgent
+        -
+          name: bookingDate
+          in: query
+          type: string
+          description: 'Simulates how shopping would behave if today was the ```@bookingDate``` (format yyyy-mm-dd).'
+        -
+          name: brandId
+          in: query
+          type: number
+          description: 'Unique number identifies a specific brand in SynXis CR.'
+        -
+          name: chainId
+          in: query
+          type: number
+          description: 'Unique ID that identifies a hotel chain or management group in SynXis'
+          required: true
+        -
+          name: content
+          in: query
+          type: string
+          description: 'Specifies if limited or full content should be returned.  If ```full``` the response will contain a ```contentList``` node.'
+          enum:
+            - none
+            - full
+        -
+          name: crsConfirmationNumber
+          in: query
+          type: string
+          description: 'CRS confirmation number associated to a preheld reservation'
+        -
+          name: primaryChannel
+          in: query
+          type: string
+          description: 'SynXis CR booking channel code (used for content customization)'
+          required: true
+        -
+          name: secondaryChannel
+          in: query
+          type: string
+          description: 'SynXis CR booking channel code (used for content customization)'
+          required: true
+        -
+          name: couponCode
+          in: query
+          description: 'Code associated with a coupon or offer'
+          type: array
+          items:
+            type: string
+        -
+          name: croId
+          in: query
+          type: string
+          description: 'SynXis CR ID for a Central Reservation Office (CRO)'
+        -
+          name: currencyCode
+          in: query
+          type: string
+          description: 'ISO-4217 three alpha currency code used to request an alternate currency that rates should include in addition to rates set up in the default currency of the hotel.  No currency conversion is performed.'
+        -
+          name: hotelId
+          in: query
+          description: 'Id that uniquely identifies a single hotel property in Control Center'
+          type: number
+          required: true
+        -
+          name: loyaltyProgram
+          in: query
+          type: string
+          description: 'Loyalty program code'
+        -
+          name: loyaltyLevel
+          in: query
+          description: 'Code associated with a loyalty program level'
+          type: array
+          items:
+            type: string
+        -
+          name: numRooms
+          in: query
+          type: integer
+          description: 'Number of rooms requested'
+          required: true
+        -
+          name: onlyCheckRequested
+          in: query
+          type: boolean
+          description: 'If true, the system will only check for product availability based upon the requested parameters.'
+        -
+          name: onlyCheckRatesWithGroups
+          in: query
+          type: boolean
+          description: 'If true, the system will check for rates where the attribute, Use with Groups is enabled,.'
+          required: false
+        -
+          name: lengthOfStay
+          in: query
+          type: integer
+          description: |
+            If populated, the system will return the `@Prices` node based on the Length of Stay instead of nightly.  For example, if startDate=2021-01-01, endDate=2020-01-04 and LOS=2 then `@Prices` nodes will be returned for
+            - startDate=2021-01-01, endDate=2021-01-03
+            - startDate=2021-01-02, endDate=2021-01-04
+          minimum: 1
+          maximum: 365
+        -
+          name: productStatus
+          in: query
+          type: array
+          description: |
+            Specifies which special product types should be returned.
+            - `overridable`: Return overridable products (useful for PMS or Voice Agent applications that can override stay restrictions)
+            - `policyviolated`: Return policy violated products
+            - `unavailable`: Return unavailable products
+          items:
+            type: string
+            enum:
+              - overridable
+              - policyviolated
+              - unavailable
+        -
+          name: roomClass
+          in: query
+          type: string
+          description: 'Room class to include in the request'
+          enum:
+            - ADACompliant
+        -
+          name: roomClassExclude
+          in: query
+          type: string
+          description: 'Room class to exclude in the request'
+          enum:
+            - ADACompliant
+        -
+          name: sortProducts
+          in: query
+          type: string
+          description: 'Specifies how the response results should be sorted'
+          enum:
+            - Product
+            - RatesThenRooms
+            - RoomsThenRates
+        -
+          name: additionalSortProducts
+          in: query
+          type: string
+          description: 'Specifies how the response results should be sorted in addition to the primary sortProducts'
+          enum:
+            - Default
+            - RequestedPrivateThenPublicRates
+            - RequestedPrivateThenRequestedPublicThenPublicRates
+        -
+          name: sortResults
+          in: query
+          type: string
+          description: 'Specifies how the response results should be sorted based on availability'
+          enum:
+            - Default
+            - AvailableFirst
+        -
+          name: startDate
+          in: query
+          required: true
+          type: string
+          format: date
+          description: 'Start date for requesting Availability (format yyyy-mm-dd)'
+        -
+          name: endDate
+          in: query
+          required: true
+          type: string
+          format: date
+          description: 'End date for requesting availability (format yyyy-mm-dd)'
+        -
+          name: rateCategoryCode
+          in: query
+          type: array
+          description: 'Code associated with a rate category'
+          items:
+            type: string
+        -
+          name: rateClass
+          in: query
+          description: 'Indicates the type of rate class'
+          type: array
+          items:
+            type: string
+            enum:
+              - Association
+              - BAR
+              - Club
+              - Convention
+              - Corporate
+              - Family
+              - Government
+              - LoyaltyAccrual
+              - Military
+              - Negotiated
+              - Package
+              - PointsAndCashRedemption
+              - PointsRedemption
+              - Promotional
+              - Rack
+              - Senior
+              - Tour
+              - TravelIndustry
+              - Unassigned
+              - Weekend
+        -
+          name: rateClassExclude
+          in: query
+          description: 'Indicates the type of rate class to exclude from the results'
+          type: array
+          items:
+            type: string
+            enum:
+              - Association
+              - BAR
+              - Club
+              - Convention
+              - Corporate
+              - Family
+              - Government
+              - LoyaltyAccrual
+              - Military
+              - Negotiated
+              - Package
+              - PointsAndCashRedemption
+              - PointsRedemption
+              - Promotional
+              - Rack
+              - Senior
+              - Tour
+              - TravelIndustry
+              - Unassigned
+              - Weekend
+        -
+          name: rateCode
+          in: query
+          type: array
+          description: 'Rate code'
+          items:
+            type: string
+        -
+          name: rateFilter
+          in: query
+          description: 'Code associated with a rate filter'
+          type: array
+          items:
+            type: string
+        -
+          name: roomCategoryCode
+          in: query
+          type: array
+          description: 'Specifies the category code associated to the room.'
+          items:
+            type: string
+        -
+          name: roomCode
+          in: query
+          type: array
+          description: 'Room code'
+          items:
+            type: string
+        -
+          name: roomFeature
+          in: query
+          type: array
+          description: 'Id of room feature being requested'
+          items:
+            type: string
+        -
+          name: roomType
+          in: query
+          type: array
+          description: 'Specifies the type of room'
+          items:
+            type: string
+            enum:
+              - Double
+              - Futon
+              - King
+              - 'Murphy Bed'
+              - Other
+              - Queen
+              - Single
+              - 'Sofa Bed'
+              - 'Tatami Mats'
+              - Twin
+              - Waterbed
+        -
+          name: roomView
+          in: query
+          type: array
+          description: 'Room view being requested'
+          items:
+            type: string
+        -
+          name: priceRangeMin
+          in: query
+          type: number
+          description: 'Low-end price range to include in the results'
+        -
+          name: priceRangeMax
+          in: query
+          type: number
+          description: 'High-end price range to include in the results'
+        -
+          name: priceRangeType
+          in: query
+          type: string
+          description: 'Indicates which value the min / max price range should apply'
+          enum:
+            - Highest
+            - Average
+            - Total
+            - FirstNight
+            - Lowest
+            - HighestInclusiveTax
+        -
+          name: priceRangeCurrency
+          in: query
+          type: string
+          description: 'Indicates which currency the min / max price range should apply'
+          enum:
+            - HotelDefaultCurrency
+            - RequestedCurrency
+        -
+          name: templateCode
+          in: query
+          type: string
+          description: 'Template code associated to a rate'
+        -
+          name: templateLevel
+          in: query
+          type: string
+          description: 'Level associated with a template code'
+          enum:
+            - Chain
+            - Hotel
+        -
+          name: deviceType
+          in: query
+          type: string
+          description: 'Device type of the guest. Used to unlock device specific rates.'
+          enum:
+            - Default
+            - Mobile
+        -
+          name: pageStart
+          in: query
+          type: number
+          description: 'Starting record to be returned in the response (used to retrieve data in smaller sets)'
+        -
+          name: pageSize
+          in: query
+          type: number
+          description: 'Number of records to be returned in the response (0 = return all)'
+      responses:
+        200:
+          description: Success
+          schema:
+            $ref: '#/definitions/HotelShopResponse'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+definitions:
+  HotelShopResponse:
+    type: object
+    properties:
+      contentLists:
+        type: object
+        properties:
+          AlertList:
+            type: array
+            items:
+              type: object
+              properties:
+                Id:
+                  type: string
+                  description: 'Id associated with the alert'
+                  example: 405d7b4b-065b-4184-a587-d18d73c35d50
+                Name:
+                  type: string
+                  description: 'Name of the alert'
+                  example: 'Pool Closed'
+                Type:
+                  type: string
+                  description: 'Type of the alert'
+                  enum:
+                    - BookingInfo
+                    - Hotel
+                    - Marketing
+                Details:
+                  type: object
+                  properties:
+                    AttachToReservation:
+                      type: boolean
+                      description: 'Indicates if the alert is stored on the reservation and attached to confirmation emails'
+                      example: false
+                    Description:
+                      type: string
+                      description: 'Short description of the alert'
+                      example: 'Pool closed due to renovation'
+                    DetailedDescription:
+                      type: string
+                      description: 'Detailed description of the alert'
+                      example: 'The pool will be closed for renovation.  During this time guests will not be able to enjoy it.'
+                    Validity:
+                      type: object
+                      properties:
+                        End:
+                          type: string
+                          description: 'End date for which the alert applies'
+                          example: '2021-04-30T00:00:00'
+                        Start:
+                          type: string
+                          description: 'Start date for which the alert applies'
+                          example: '2021-04-01T00:00:00'
+                    Visibility:
+                      type: object
+                      properties:
+                        End:
+                          type: string
+                          description: 'End date for when the alert should display'
+                          example: '2021-04-30T00:00:00'
+                        Start:
+                          type: string
+                          description: 'Start date for when the alert should display'
+                          example: '2021-03-01T00:00:00'
+          ChargeList:
+            type: array
+            items:
+              type: object
+              properties:
+                Code:
+                  type: string
+                  description: 'Code associated with a fee or tax'
+                  example: City1-10
+                Level:
+                  type: string
+                  description: 'Level is used to convey the charge level'
+                  enum:
+                    - Hotel
+                    - Package
+                    - Rate
+                    - Room
+                Name:
+                  type: string
+                  description: 'Name associated with the fee or tax'
+                  example: 'City Tax'
+                Type:
+                  type: string
+                  description: 'Type of the tax or fee'
+                  enum:
+                    - BedTax
+                    - CityHotelFee
+                    - CityTax
+                    - CountyTax
+                    - EnergyTax
+                    - FederalTax
+                    - FoodBeverageTax
+                    - LodgingTax
+                    - MaintenanceFee
+                    - MiscellaneousFee
+                    - MiscellaneousTax
+                    - OccupancyTax
+                    - PackageFee
+                    - ResortFee
+                    - RoomTax
+                    - SalesTax
+                    - ServiceCharge
+                    - StateTax
+                    - Surcharge
+                    - TotalTax
+                    - TourismTax
+                    - VAT_GST_Tax
+                Details:
+                  type: object
+                  properties:
+                    Description:
+                      type: string
+                      description: 'Description of the tax or fee.'
+                      example: 'Local City Tax'
+                    Frequency:
+                      type: string
+                      description: 'Frequency of the tax or fee.'
+                      example: PerNight
+                      enum:
+                        - PerNight
+                        - PerStay
+                    ChargePer:
+                      type: string
+                      description: 'Specifies how the tax is charged.'
+                      example: FlatCharge
+                      enum:
+                        - FlatCharge
+                        - PerPerson
+                        - PerAdult
+                        - PerChild
+                        - PerGuestOffset
+                    TaxAmount:
+                      type: string
+                      description: 'Configured tax amount to be charged, either as a percent or fixed amount.'
+                      example: 11.0
+                    FactorType:
+                      type: string
+                      description: 'Conveys the factor type of the tax.'
+                      example: Percentage
+                      enum:
+                        - Amount
+                        - Percentage
+                    IsInclusive:
+                      type: boolean
+                      description: 'If true, indicates that the tax is inclusive.'
+                      example: false
+                    SortOrder:
+                      type: string
+                      description: 'Sort order of the tax within its level.'
+                      example: 3
+          CouponList:
+            type: array
+            items:
+              type: object
+              properties:
+                Code:
+                  type: string
+                  description: 'Code associated with a coupon or offer'
+                  example: CPN1
+                Name:
+                  type: string
+                  description: 'Name of a coupon or offer'
+                  example: 'Save 10% off Total Price'
+                Description:
+                  type: string
+                  description: 'Description of a coupon or offer'
+                  example: 'Discount OFF promotion'
+          CurrencyList:
+            type: array
+            items:
+              type: object
+              properties:
+                CurrencyCode:
+                  type: string
+                  description: 'ISO 4217 three alpha currency code'
+                  example: USD
+                DecimalPlaces:
+                  type: number
+                  description: 'Number of decimals supported by the currency'
+                  example: 2
+                Symbol:
+                  type: string
+                  description: 'Symbol of the currency'
+                  example: $
+          PolicyList:
+            type: object
+            properties:
+              BookingPolicy:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      description: 'Code for a booking policy'
+                      example: GUA
+                    DepositFee:
+                      type: object
+                      properties:
+                        Amount:
+                          type: number
+                          description: 'Amount of the deposit'
+                          example: 1.0
+                        DueDays:
+                          type: number
+                          description: 'Specifies the amount of days, dependent on the parameter "@dueType".'
+                          example: 0
+                        DueTime:
+                          type: string
+                          description: 'Specifies the deposit time, dependent on the parameter "@dueType".'
+                          example: '00:00:00.0000000'
+                        DueType:
+                          type: string
+                          description: 'Specifies when a deposit fee should be paid.'
+                          example: AtTimeOfBooking
+                          enum:
+                            - None
+                            - NumberDaysBeforeArrival
+                            - NumberDaysAfterBooking
+                            - AtTimeOfBooking
+                        TaxInclusive:
+                          type: boolean
+                          description: 'Specifies whether a deposit fee already includes tax.'
+                          example: false
+                        IsPrePayment:
+                          type: boolean
+                          description: 'If true, indicates the Sabre payment processor handles the transaction.  When false, the PMS or the property processes the transaction.'
+                          example: false
+                        Type:
+                          type: string
+                          description: 'Type of a deposit fee'
+                          example: NumberNightsOfStay
+                          enum:
+                            - NumberNightsOfStay
+                            - PercentAmountOfStay
+                            - LocalCurrency
+                            - None
+                    Description:
+                      type: string
+                      description: 'Detailed information about a booking policy'
+                      example: 'A credit card is required at the time of booking.'
+                    TransactionFeeDisclaimer:
+                      type: string
+                      description: 'Booking policy description related information'
+                    GuaranteeLevel:
+                      type: string
+                      description: 'Defines the requirements to be fulfilled so that the hotel holds the reservation. The option *Guarantee* means that the guest needs to provide additional data, as specified in the guarantee policy (i.e. a credit card number). *Deposit* means that a deposit must be paid and *HoldPeriod* indicates that the hotel holds the reservation until a particular date and no additional requirements are imposed.'
+                      example: Guarantee
+                      enum:
+                        - Guarantee
+                        - Deposit
+                        - HoldPeriod
+                    RefundableStay:
+                      type: string
+                      description: 'Indicates if the deposit or prepayment is refundable'
+                      example: Refundable
+                      enum:
+                        - Unknown
+                        - Refundable
+                        - NonRefundable
+                    HoldTime:
+                      type: string
+                      description: 'Specifies a period after which a reservation is cancelled that the room inventory is released.'
+                      example: '0'
+                    AllowPay:
+                      type: boolean
+                      description: 'Indicates if pay at the time of booking is available. This feature is applicable when a product (rate + room) has an applicable guarantee policy and Payment Processing has been configured.'
+                      example: true
+                    Requirements:
+                      type: array
+                      items:
+                        type: string
+                        description: 'List of options that allows you to specify what is required according to the booking policy.'
+                        example: 'Credit Card'
+                    AutoCancel:
+                      type: object
+                      properties:
+                        Hours:
+                          type: integer
+                          description: 'Indicates the Auto-cancellation of Reservation based on the end of hours set from the booking time.'
+                          example: 6
+                        Time:
+                          type: integer
+                          description: 'Indicates the Auto-cancellation of Reservation based on the time.'
+                          example: 2359
+              CancelPolicy:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    CancellationPermitted:
+                      type: boolean
+                      description: 'Indicates if a reservation can be cancelled'
+                      example: true
+                    Code:
+                      type: string
+                      description: 'Code associated with a cancel policy'
+                      example: 24H
+                    LateCancellationPermitted:
+                      type: boolean
+                      description: 'If true, indicates the guest can cancel a reservation within a cancellation time frame defined in the cancellation policy. A cancellation number is generated, and the room is returned to the inventory. Note that this does not automatically waive any applicable cancellation fees.'
+                      example: true
+                    CancelFeeAmount:
+                      type: object
+                      properties:
+                        Value:
+                          type: number
+                          description: 'Amount of the cancellation fee'
+                          example: 1.0
+                        TaxInclusive:
+                          type: boolean
+                          description: 'Specifies whether tax is already included in a cancellation fee'
+                          example: false
+                    CancelFeeType:
+                      type: string
+                      description: 'Cancel fee type'
+                      example: NumberNightsOfStay
+                      enum:
+                        - NumberNightsOfStay
+                        - PercentAmountOfStay
+                        - LocalCurrency
+                        - None
+                    CancelPenaltyDate:
+                      type: string
+                      description: 'Specifies the date at which a cancellation fee starts to apply'
+                    ChargeThreshold:
+                      type: string
+                      description: 'Miscellaneous charge-related information'
+                    ChargeType:
+                      type: string
+                      description: 'Specifies charge type associated with cancellation'
+                      example: ChargeWithinHours
+                      enum:
+                        - AlwaysChargeCancelFee
+                        - ChargeWithinDays
+                        - ChargeWithinDaysTime
+                        - ChargeWithinHours
+                        - ChargeWithinTime
+                        - NeverChargeCancelFee
+                    CancelTime:
+                      type: string
+                      description: 'Latest date at which the guest needs to cancel the reservation to avoid the cancellation fee'
+                      example: 0
+                    CancelTimeIn:
+                      type: number
+                      description: 'Number of hours or days before the reservation date when the guest needs to cancel the reservation to avoid the cancellation fee'
+                      example: 24
+                    Description:
+                      type: string
+                      description: 'Detailed information about the cancellation policy'
+                      example: 'Reservation must be cancelled 24 hours before arrival'
+                    ModificationRestrictions:
+                      type: string
+                      description: 'Specifies what modifications to a reservation are allowed and who can make them'
+                      example: 'Allow except GDS/IDS within cancel policy'
+                    NoShowFeeAmount:
+                      type: object
+                      properties:
+                        TaxInclusive:
+                          type: boolean
+                          description: 'Specifies whether tax is already included in a no-show fee'
+                          example: false
+                        Value:
+                          type: number
+                          description: 'No show fee amount'
+                          example: 0.0
+                    NoShowFeeType:
+                      type: string
+                      description: 'Specifies what a no-show fee is dependent on'
+                      example: None
+                      enum:
+                        - NumberNightsOfStay
+                        - PercentAmountOfStay
+                        - LocalCurrency
+                        - None
+                    Charges:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          DaysToArrive:
+                            type: number
+                            description: 'Number of days before arrival the reservation can be cancelled'
+                          CancelFeeIncludesTax:
+                            type: boolean
+                            description: 'Specifies whether tax is already included in a cancellation fee'
+                            example: false
+                          CancelFeeAmount:
+                            type: number
+                            description: 'Amount of the cancellation fee'
+              CommisionPolicy:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Code:
+                      type: string
+                      description: 'Code associated with the commission policy'
+                      example: 10H
+                    Description:
+                      type: string
+                      description: 'Description of the commission policy'
+                      example: '10% commission policy'
+                    Commission:
+                      type: object
+                      properties:
+                        Value:
+                          type: number
+                          description: 'Commission value for the policy'
+                          example: 0.1
+                        UnitType:
+                          type: string
+                          description: 'Commission basis unit for the policy'
+                          example: Percentage
+                          enum:
+                            - Amount
+                            - Percentage
+                        CalculationType:
+                          type: string
+                          description: 'Commission calculation type for the policy'
+                          example: PerNight
+                          enum:
+                            - PerNight
+                            - PerStay
+          RateCategoryList:
+            type: array
+            items:
+              type: object
+              properties:
+                CategoryCode:
+                  type: string
+                  description: 'Id associated to the rate category'
+                  example: BAR
+                Name:
+                  type: string
+                  description: 'Rate category name'
+                  example: 'Best Available Rate'
+                Details:
+                  type: object
+                  properties:
+                    Description:
+                      type: string
+                      description: 'Description of the rate category'
+                      example: 'Best Available Rate'
+          RateList:
+            type: array
+            items:
+              type: object
+              properties:
+                CategoryCode:
+                  type: string
+                  description: 'Code associated with the rate category'
+                  example: BAR
+                Code:
+                  type: string
+                  description: 'Code associated with a rate'
+                  example: BAR
+                CurrencyCode:
+                  type: string
+                  description: 'ISO 4217 three alpha currency code'
+                  example: USD
+                Name:
+                  type: string
+                  description: 'Name associated to the rate'
+                  example: 'Best Available Rate'
+                RevenueType:
+                  type: string
+                  description: 'Revenue type associated to the rate'
+                  example: None
+                  enum:
+                    - None
+                    - Complimentary
+                    - HouseUse
+                SortOrder:
+                  type: string
+                  description: 'Sort order associated to the rate'
+                  example: 1
+                Details:
+                  type: object
+                  properties:
+                    BookingMethod:
+                      type: string
+                      description: 'Booking method associated to the rate'
+                    CommissionablePercentage:
+                      type: number
+                      description: 'Commission percentage associated to the rate'
+                      example: 10.0
+                    CountryList:
+                      description: 'If the guest making a reservation resides in any of these countries, then the guest will be automatically enrolled in the loyalty program if this rate is booked.'
+                      type: array
+                      items:
+                        properties:
+                          Code:
+                            type: string
+                            description: 'ISO 1366-1 country code'
+                            example: US
+                    Description:
+                      type: string
+                      description: 'Basic descriptive information about the rate'
+                    CustLoyaltyList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Name:
+                            type: string
+                            description: 'Name of the loyalty program'
+                            example: 'My Rewards'
+                          ProgramID:
+                            type: string
+                            description: 'Loyalty program id'
+                            example: MYRWDS
+                          Level:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                Code:
+                                  type: string
+                                  description: 'Loyalty level code'
+                                  example: GOLD
+                                Name:
+                                  type: string
+                                  description: 'Name of the loyalty level'
+                                  example: 'Gold Level Membership'
+                    DetailedDescription:
+                      type: string
+                      description: 'Detailed descriptive information about the rate'
+                      example: '48 Hour Special with Breakfast included'
+                    DisplayName:
+                      type: string
+                      description: 'Display name associated to the rate'
+                      example: '48 Hour Special'
+                    DisplayDescription:
+                      type: string
+                      description: 'Descriptive information associated with the rate'
+                      example: '48 Hour Special with Breakfast included'
+                    ImageList:
+                      $ref: '#/definitions/Images'
+                    Indicators:
+                      type: object
+                      properties:
+                        AutoEnrollmentEnabled:
+                          type: boolean
+                          description: 'Indicates if the rate auto enrolls the guest in the loyalty program of the chain.'
+                          example: false
+                        Commissionable:
+                          type: boolean
+                          description: 'Indicates if the rate is commissionable'
+                          example: false
+                        Corporate:
+                          type: boolean
+                          description: 'Indicates if the rate is a corporate rate'
+                          example: false
+                        CredentialsRequired:
+                          type: boolean
+                          description: 'Indicates if credentials are required to book the rate'
+                          example: false
+                        Group:
+                          type: boolean
+                          description: 'Indicates if the rate is a group rate'
+                          example: false
+                        Loyalty:
+                          type: boolean
+                          description: 'Indicates if the rate is a loyalty rate'
+                          example: false
+                        LoyaltyAccrual:
+                          type: boolean
+                          description: 'Indicates if the rate allows for loyalty point accrual'
+                          example: false
+                        Monthly:
+                          type: boolean
+                          description: 'Indicates if the rate is a monthly rate'
+                          example: false
+                        Promotional:
+                          type: boolean
+                          description: 'Indicates if the rate is a promotional rate'
+                          example: false
+                        Redeemable:
+                          type: boolean
+                          description: 'Indicates if the rate is eligible for loyalty redemption'
+                          example: false
+                        Suppressed:
+                          type: boolean
+                          description: 'Indicates if the rate is suppressed'
+                          example: false
+                        TaxInclusive:
+                          type: boolean
+                          description: 'Indicates if the rate is inclusive of taxes'
+                          example: false
+                        VA_restricted:
+                          type: boolean
+                          description: 'Indicates if the rate is restricted to Voice Agent'
+                          example: false
+                        ViewOnly:
+                          type: boolean
+                          description: 'Indicates if the rate is view only.  Call Agent could see a GDS rate but not able to book.'
+                          example: false
+                        AllowSingleUseCard:
+                          type: boolean
+                          description: 'Indicates if the rate allows a single use credit card'
+                          example: false
+                        PointsOnly:
+                          type: boolean
+                          description: 'Indicates if the rate is eligible for points only'
+                          example: false
+                        MappedAsCorporate:
+                          type: boolean
+                          description: 'Indicates if the rate is mapped as a corporate rate'
+                          example: false
+                    LoyaltyRedemptionType:
+                      type: string
+                      description: 'Type of loyalty redemption'
+                      enum:
+                        - FreeNightStay
+                        - PointsAndCash
+                    RateClass:
+                      type: string
+                      description: 'Rate class associated to the rate.'
+                      example: Promotional
+                    ChannelAccessOverridesList:
+                      type: object
+                      properties:
+                        ChannelAccessOverrides:
+                          type: array
+                          items:
+                            properties:
+                              accessCode:
+                                type: string
+                                description: 'Access code represents the negotiated rate access code.'
+                                example: 'GDS NRAC'
+                              name:
+                                type: string
+                                description: 'Name of the rate that is displayed to the travel agent when they enter the access code.'
+                    SpecialInstructions:
+                      type: string
+                      description: 'Special instruction related information about the rate.'
+                    MealPlan:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code associated with a meal plan'
+                          example: Breakfast
+                PackageList:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      Code:
+                        type: string
+                        description: 'Code for the package associated to the rate'
+                        example: BKFST
+                      Name:
+                        type: string
+                        description: 'Name of the package associated to the rate'
+                        example: Breakfast
+                      Description:
+                        type: string
+                        description: 'Description of the package associated to the rate'
+                        example: 'Hot Breakfast upgrade for each Adult'
+          RoomCategoryList:
+            type: array
+            items:
+              type: object
+              properties:
+                CategoryCode:
+                  type: string
+                  description: 'Code associated with a collection of similar room types'
+                  example: DBL
+                Name:
+                  type: string
+                  description: 'Name of the room category'
+                  example: Double
+                Details:
+                  type: object
+                  properties:
+                    Description:
+                      type: string
+                      description: 'Description of the room category'
+                      example: Double
+                    ImageList:
+                      $ref: '#/definitions/Images'
+          RoomList:
+            $ref: '#/definitions/Room'
+          MealPlanList:
+            type: array
+            items:
+              type: object
+              properties:
+                Code:
+                  type: string
+                  description: 'Code associated with a meal plan'
+                  example: Breakfast
+                Chargeable:
+                  type: boolean
+                  description: 'If true, indicates the meal plan is chargeable'
+                  example: true
+                Charge:
+                  type: number
+                  description: 'Charge amount of the meal plan'
+                  example: 15.0
+                Name:
+                  type: string
+                  description: 'Name of the meal plan'
+                  example: Breakfast
+                Description:
+                  type: string
+                  description: 'Description of the meal plan'
+                  example: 'Buffet breakfast is included in the rate'
+                GDSdescription:
+                  type: string
+                  description: 'GDS description of the meal plan'
+                  example: 'Buffet Breakfast'
+                Type:
+                  type: string
+                  description: 'Type of the meal plan'
+                  example: American
+                  enum:
+                    - American
+                    - BedBreakfast
+                    - Bermuda
+                    - CaribbeanPlan
+                    - Continental
+                    - DinnerBedBreakfast
+                    - European
+                    - FamilyAmerican
+                    - FullBreakfast
+                    - Family
+                    - Modified
+                    - RoomOnly
+                    - EnglishBreakfast
+                    - AllInclusive
+                    - BuffetBreakfast
+                    - Breakfast
+      productAvailability:
+        type: object
+        properties:
+          AlertList:
+            type: array
+            items:
+              type: object
+              properties:
+                Id:
+                  type: string
+                  description: 'Id associated with the alert'
+                  example: 405d7b4b-065b-4184-a587-d18d73c35d50
+          CouponList:
+            type: array
+            items:
+              type: object
+              properties:
+                Code:
+                  type: string
+                  description: 'Code for a coupon or offer'
+                  example: CPN1
+          Hotel:
+            type: object
+            properties:
+              Id:
+                type: number
+                description: 'Code that uniquely identifies a single hotel property in Control Center.'
+                example: 13098
+          LeastRestrictiveFailure:
+            type: object
+            description: 'Identifies the one failure that if fixed would have the highest chance of getting availability for the property.  This node is only returned if the hotel is not available.'
+            properties:
+              Date:
+                type: string
+                description: 'Date associated with the failure reason'
+                example: '2020-08-03T00:00:00'
+              OverrideAllowed:
+                type: string
+                description: 'Indicate if the failure can be overridden'
+                example: false
+              AdditionalInformation:
+                type: string
+                description: 'Descriptive information associated with the failure'
+                example: 0
+              Level:
+                type: string
+                description: 'Level-related information associated with the failure'
+                example: RoomInventory
+              ProductStatus:
+                type: string
+                description: 'Product status-related information associated with the failure'
+                example: NoAvailableInventory
+          Paging:
+            $ref: '#/definitions/Paging'
+          Prices:
+            type: array
+            items:
+              type: object
+              properties:
+                ArrivalDate:
+                  type: string
+                  description: 'Arrival date if LOS override is specified'
+                DepartureDate:
+                  type: string
+                  description: 'Depature date if LOS override is specified'
+                Available:
+                  type: boolean
+                  description: 'Indicates if the product is available'
+                  example: true
+                AvailableInventory:
+                  type: number
+                  description: 'Available inventory count'
+                  example: 15
+                CouponApplies:
+                  type: boolean
+                  description: 'Indicates if a coupon applies to the product'
+                  example: false
+                IsMaximumPricedItem:
+                  type: boolean
+                  description: 'Indicates if the product is the maximum priced item in the response'
+                  example: false
+                IsMinimumPricedItem:
+                  type: boolean
+                  description: 'Indicates if the product is the minimum priced item in the response'
+                  example: false
+                SortSequenceNumber:
+                  type: number
+                  description: 'Sorting sequence number associated of the product'
+                  example: 3
+                Product:
+                  type: object
+                  properties:
+                    AccessCode:
+                      type: string
+                      description: 'Access code associated with the product'
+                    BookingCode:
+                      type: string
+                      description: 'Booking code associated with the product'
+                    CouponApplies:
+                      type: boolean
+                      description: 'Indicates if a coupon applies to the product'
+                      example: false
+                    Id:
+                      type: string
+                      description: 'Id of the product'
+                    LoyaltyApplicable:
+                      type: boolean
+                      description: 'Indicates if this is a loyalty product'
+                    PolicyModificationViolation:
+                      type: boolean
+                      description: 'Indicates if the rate is restricted to Late Modification'
+                    Ref:
+                      type: string
+                      description: 'Ref indicates the availability reference type. If not specified, it applies to all applicable products.'
+                      enum:
+                        - AccessCode
+                        - AccessGeoLocation
+                        - Agent
+                        - ChannelizedRateAccessCode
+                        - Corporate
+                        - Group
+                        - Loyalty
+                        - Rate
+                        - RateClass
+                        - RateFilter
+                        - Room
+                        - RoomFeature
+                        - Template
+                        - Unknown
+                    RefValue:
+                      type: string
+                      description: 'Ref Value indicates the corresponding value of the availability reference type.'
+                    AlertList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Id:
+                            type: string
+                            description: 'Id of the alert'
+                            example: 405d7b4b-065b-4184-a587-d18d73c35d50
+                    CommissionPolicy:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code associated to the Commission policy'
+                          example: 10H
+                    BookingPolicy:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code associated to the Booking policy'
+                          example: GUA
+                    CancelPolicy:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code associated to the Cancel policy'
+                          example: 24H
+                    FailureList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Date:
+                            type: string
+                            description: 'Date associated to the failure'
+                            example: '2020-08-30T00:00:00'
+                          Description:
+                            type: string
+                            description: 'Description of the failure'
+                          Level:
+                            type: string
+                            description: 'Level of the failure'
+                            example: RoomInventory
+                          OverrideAllowed:
+                            type: boolean
+                            description: 'Indicates if the failure can be overridden'
+                            example: false
+                          Value:
+                            type: string
+                            description: 'Value of the failure'
+                    Prices:
+                      type: object
+                      properties:
+                        TaxesFeesIncluded:
+                          type: boolean
+                          description: 'Indicates if taxes and fees are included in the price'
+                        Daily:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              Date:
+                                type: string
+                                format: date
+                                description: 'Date associated to the price'
+                                example: '2020-08-29T00:00:00'
+                              AvailableInventory:
+                                type: number
+                                description: 'Available inventory count'
+                                example: 15
+                              OriginalPrice:
+                                type: object
+                                properties:
+                                  Amount:
+                                    type: number
+                                    description: 'Applicable amount'
+                                    example: 100.0
+                                  CurrencyCode:
+                                    type: string
+                                    description: 'ISO 4217 three alpha currency code'
+                                    example: USD
+                                  IsSlashThrough:
+                                    type: boolean
+                                    description: 'If true, indicates the original price should display slash through pricing, i.e. hidden, price.'
+                                    example: true
+                                  Points:
+                                    type: number
+                                    description: 'Applicable number of points'
+                                  Fees:
+                                    type: object
+                                    properties:
+                                      amount:
+                                        type: number
+                                        description: 'Applicable fee amount'
+                                        example: 0.0
+                                  Tax:
+                                    type: object
+                                    properties:
+                                      amount:
+                                        type: number
+                                        description: 'Applicable tax amount'
+                                        example: 11.0
+                                  Total:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable total amount'
+                                        example: 100.0
+                                      AmountWithTaxesFees:
+                                        type: number
+                                        description: 'Applicable total amount including taxes and fees'
+                                        example: 110.0
+                              Price:
+                                type: object
+                                properties:
+                                  Amount:
+                                    type: number
+                                    description: 'Applicable amount'
+                                    example: 90.0
+                                  CurrencyCode:
+                                    type: string
+                                    description: 'ISO 4217 three alpha currency code'
+                                    example: USD
+                                  Points:
+                                    type: number
+                                    description: 'Applicable number of points'
+                                  Fees:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable fee amount'
+                                        example: 0.0
+                                      StayFeesAmount:
+                                        type: number
+                                        description: 'Applicable stay fee amount'
+                                        example: 0.0
+                                      BreakDown:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            Amount:
+                                              type: number
+                                              description: 'Applicable charge amount'
+                                              example: 15.0
+                                            Code:
+                                              type: string
+                                              description: 'Code associated to the charge'
+                                            Points:
+                                              type: number
+                                              description: 'Applicable number of points'
+                                            IsPayAtProperty:
+                                              type: boolean
+                                              description: 'If true, indicates the amount is payable at the hotel.'
+                                              example: true
+                                            IsPerStay:
+                                              type: boolean
+                                              description: 'If true, indicates whether the fee is per stay or not.'
+                                              example: true
+                                  Tax:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable tax amount'
+                                        example: 9.9
+                                      StayTaxAmount:
+                                        type: number
+                                        description: 'Applicable stay tax amount'
+                                      BreakDown:
+                                        type: array
+                                        items:
+                                          type: object
+                                          properties:
+                                            Amount:
+                                              type: number
+                                              description: 'Applicable charge amount'
+                                              example: 9.9
+                                            Code:
+                                              type: string
+                                              description: 'Code associated to the charge'
+                                              example: State
+                                            Points:
+                                              type: number
+                                              description: 'Applicable number of points'
+                                            IsPayAtProperty:
+                                              type: boolean
+                                              description: 'If true, indicates the amount is payable at the hotel.'
+                                              example: true
+                                            IsPerStay:
+                                              type: boolean
+                                              description: 'If true, indicates whether the tax is per stay or not.'
+                                              example: true
+                                  Total:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable total amount'
+                                        example: 90.0
+                                      AmountWithTaxesFees:
+                                        type: number
+                                        description: 'Applicable total amount including taxes and fees'
+                                        example: 99.9
+                                      AmountWithInclusiveTaxes:
+                                        type: number
+                                        description: 'Applicable total amount including taxes'
+                                        example: 90.0
+                                      Points:
+                                        type: number
+                                        description: 'Applicable number of points'
+                        Monthly:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              EndDate:
+                                type: string
+                                description: 'End date of the monthly pricing'
+                                example: '2020-08-29T00:00:00'
+                              StartDate:
+                                type: string
+                                description: 'Start date of the monthly pricing'
+                                example: '2020-08-30T00:00:00'
+                              Price:
+                                type: object
+                                properties:
+                                  Amount:
+                                    type: number
+                                    description: 'Applicable amount'
+                                  CurrencyCode:
+                                    type: string
+                                    description: 'ISO 4217 three alpha currency code'
+                                    example: USD
+                                  Fees:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable fee amount'
+                                  Tax:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable tax amount'
+                                        example: 9.9
+                                  Total:
+                                    type: object
+                                    properties:
+                                      Amount:
+                                        type: number
+                                        description: 'Applicable total amount'
+                                        example: 90.0
+                                      AmountWithTaxesFees:
+                                        type: number
+                                        description: 'Applicable total amount including taxes and fees'
+                                        example: 99.9
+                        PerNight:
+                          type: object
+                          properties:
+                            Price:
+                              type: object
+                              properties:
+                                Amount:
+                                  type: number
+                                  description: 'Applicable amount'
+                                CurrencyCode:
+                                  type: string
+                                  description: 'ISO 4217 three alpha currency code'
+                                  example: USD
+                                Points:
+                                  type: number
+                                  description: 'Applicable number of points'
+                                Fees:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable fee amount'
+                                      example: 0
+                                    Points:
+                                      type: number
+                                      description: 'Applicable number of points'
+                                Tax:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable tax amount'
+                                      example: 9.9
+                                    Points:
+                                      type: number
+                                      description: 'Applicable number of points'
+                                Total:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable total amount'
+                                      example: 90.0
+                                    AmountWithTaxesFees:
+                                      type: number
+                                      description: 'Applicable total amount including taxes and fees'
+                                      example: 99.9
+                                    Points:
+                                      type: number
+                                      description: 'Applicable number of points'
+                        Total:
+                          type: object
+                          properties:
+                            OriginalPrice:
+                              type: object
+                              properties:
+                                Amount:
+                                  type: number
+                                  description: 'Applicable amount'
+                                  example: 100.0
+                                CurrencyCode:
+                                  type: string
+                                  description: 'ISO 4217 three alpha currency code'
+                                  example: USD
+                                IsSlashThrough:
+                                  type: boolean
+                                  description: 'If true, indicates the original price should display slash through pricing, i.e. hidden, price.'
+                                  example: true
+                                Points:
+                                  type: number
+                                  description: 'Applicable number of points'
+                                Fees:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable fee amount'
+                                      example: 0
+                                Tax:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable tax amount'
+                                      example: 11.0
+                                Total:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable total amount'
+                                      example: 100.0
+                                    AmountWithTaxesFees:
+                                      type: number
+                                      description: 'Applicable total amount including taxes and fees'
+                                      example: 110.0
+                            Price:
+                              type: object
+                              properties:
+                                Amount:
+                                  type: number
+                                  description: 'Applicable amount'
+                                CurrencyCode:
+                                  type: string
+                                  description: 'ISO 4217 three alpha currency code'
+                                  example: USD
+                                Points:
+                                  type: number
+                                  description: 'Applicable number of points'
+                                Fees:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable fee amount'
+                                      example: 0
+                                    StayFeesAmount:
+                                      type: number
+                                      description: 'Applicable stay fee amount'
+                                    BreakDown:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          Amount:
+                                            type: number
+                                            description: 'Applicable charge amount'
+                                          Code:
+                                            type: string
+                                            description: 'Code associated to the charge'
+                                          Points:
+                                            type: number
+                                            description: 'Applicable number of points'
+                                          IsPerStay:
+                                            type: boolean
+                                            description: 'If true, indicates whether the fee is per stay or not.'
+                                            example: true
+                                Tax:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable tax amount'
+                                    StayTaxAmount:
+                                      type: number
+                                      description: 'Applicable stay tax amount'
+                                    BreakDown:
+                                      type: array
+                                      items:
+                                        type: object
+                                        properties:
+                                          Amount:
+                                            type: number
+                                            description: 'Applicable charge amount'
+                                            example: 9.9
+                                          Code:
+                                            type: string
+                                            description: 'Code associated to the charge'
+                                            example: State
+                                          Points:
+                                            type: number
+                                            description: 'Applicable number of points'
+                                          IsPerStay:
+                                            type: boolean
+                                            description: 'If true, indicates whether the tax is per stay or not.'
+                                            example: true
+                                Total:
+                                  type: object
+                                  properties:
+                                    Amount:
+                                      type: number
+                                      description: 'Applicable total amount'
+                                      example: 90.0
+                                    AmountWithTaxesFees:
+                                      type: number
+                                      description: 'Applicable total amount including taxes and fees'
+                                      example: 99.9
+                                    AmountWithInclusiveTaxes:
+                                      type: number
+                                      description: 'Applicable total amount including taxes'
+                                      example: 90.0
+                                    Points:
+                                      type: number
+                                      description: 'Applicable number of point'
+                                    AmountPayableNow:
+                                      type: number
+                                      description: 'Applicable total amount (due at confirmation) excluding any payable at the hotel amount'
+                                      example: 90.0
+                                    AmountPayAtProperty:
+                                      type: number
+                                      description: 'Applicable total amount payable at the hotel excluding payable now amount'
+                                      example: 90.0
+                    Rate:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code used to specify a rate type'
+                          example: BAR
+                    Room:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code used to specify a room type'
+                          example: SUJR
+                    MealPlanList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Code:
+                            type: string
+                            description: 'code indicates the meal plan code'
+                            example: Breakfast
+                          Date:
+                            type: string
+                            description: 'date indicates the price season date of the meal plan'
+                    StayLimits:
+                      type: object
+                      properties:
+                        MinimumStay:
+                          type: integer
+                          description: 'Minimum stay required to book this product.'
+                          example: 1
+                        MaximumStay:
+                          type: integer
+                          description: 'Maximum stay required to book this product.'
+                          example: 30
+                        MaxStayThru:
+                          type: integer
+                          description: 'Maximum stay thru required to book this product.'
+                          example: 30
+                    ReferenceList:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Ref:
+                            type: string
+                            description: 'Ref indicates the availability reference type. If not specified, it applies to all applicable products.'
+                            enum:
+                              - AccessCode
+                              - AccessGeoLocation
+                              - Agent
+                              - ChannelizedRateAccessCode
+                              - Corporate
+                              - Group
+                              - Loyalty
+                              - Rate
+                              - RateClass
+                              - RateFilter
+                              - Room
+                              - RoomFeature
+                              - 'Template - Unknown'
+                          RefValue:
+                            type: string
+                            description: 'Ref Value indicates the corresponding value of the availability reference type.'
+          AdditionalPrices:
+            type: object
+            properties:
+              Product:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    PerGuest:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          Guest:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                AgeQualifyingCode:
+                                  type: string
+                                  description: 'Code that determines the charges for a guest'
+                                  example: Adult
+                                NumGuests:
+                                  type: number
+                                  description: 'Number of guests'
+                                  example: 2
+                          Price:
+                            type: object
+                            properties:
+                              CurrencyCode:
+                                type: string
+                                description: 'ISO 4217 three alpha currency code'
+                                example: USD
+                              Average:
+                                type: object
+                                properties:
+                                  Points:
+                                    type: number
+                                    description: 'Applicable number of points'
+                                  Amount:
+                                    type: number
+                                    description: 'average amount'
+                              Total:
+                                type: object
+                                properties:
+                                  Points:
+                                    type: number
+                                    description: 'Applicable number of points'
+                                  Amount:
+                                    type: number
+                                    description: 'Applicable total amount'
+                                    example: 180.0
+                                  AmountWithTaxesFees:
+                                    type: number
+                                    description: 'Applicable total amount including taxes and fees'
+                                    example: 200.0
+                    Rate:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code associated with a rate'
+                          example: BAR
+                    Room:
+                      type: object
+                      properties:
+                        Code:
+                          type: string
+                          description: 'Code associated with a room'
+                          example: SUJR
+      Warning:
+        type: array
+        items:
+          properties:
+            Code:
+              type: string
+              description: 'Returns an Application-specific code.'
+            Value:
+              type: string
+              description: 'Value associated to the Message.'
+  Images:
+    type: array
+    items:
+      type: object
+      properties:
+        Caption:
+          type: string
+          description: 'Caption of the image'
+          example: 'Ocean View'
+        Path:
+          type: string
+          description: 'URL to the image file'
+          example: 'https://hotel.cloudfront.net/imageRepo/1/OceanView.jpg'
+        Description:
+          type: string
+          description: 'Description of the image.  (ICE Portal images only)'
+          example: 'Restaurant with Ocean View'
+        SortOrder:
+          type: integer
+          description: 'Specifies the sequence in which the search results are displayed'
+          example: 1
+        MediaType:
+          type: string
+          description: 'Media type of the image'
+          enum:
+            - CRS
+            - VScape
+            - 'ICE Portal'
+        MediaCategory:
+          type: string
+          description: 'Media category associated to the image'
+          example: Rate
+  Room:
+    type: array
+    items:
+      type: object
+      properties:
+        CategoryCode:
+          type: string
+          description: 'Category code associated to the room'
+          example: Suites
+        Code:
+          type: string
+          description: 'Code associated to the room.'
+          example: SUJR
+        Name:
+          type: string
+          description: 'Name of the room (supports translation)'
+          example: Suites
+        PmsCode:
+          type: string
+          description: 'PMS code associated with the room.'
+          example: HCP1
+        SortOrder:
+          type: number
+          description: 'Specifies the sequence in which the search results are displayed.'
+          example: 5
+        Details:
+          $ref: '#/definitions/RoomDetails'
+  RoomDetails:
+    type: object
+    properties:
+      AdaComplaint:
+        type: boolean
+        description: 'If true, indicates the room is ADA compliant.'
+      Bedding:
+        type: array
+        items:
+          type: object
+          properties:
+            Code:
+              type: string
+              description: 'Code associated to the bedding type of the room.'
+              example: Q
+            Description:
+              type: string
+              description: 'Description of the bedding type'
+              example: Queen
+            IsPrimary:
+              type: boolean
+              description: 'If true, indicates the bedding is the primary bedding type for the room.'
+              example: true
+            Quantity:
+              type: integer
+              description: 'Number of beds associated to the bedding type.'
+              example: 1
+            Type:
+              type: string
+              description: 'Bed configuration associate to the room type.'
+              example: Queen
+              enum:
+                - Double
+                - Futon
+                - King
+                - 'Murphy Bed'
+                - Other
+                - Queen
+                - Single
+                - 'Sofa Bed'
+                - 'Tatami Mats'
+                - Twin
+                - Waterbed
+      ChildOccupancy:
+        type: array
+        items:
+          type: object
+          properties:
+            AgeRange:
+              type: object
+              properties:
+                From:
+                  type: number
+                  description: 'Minimum child age of the occupancy restriction.'
+                  example: 0
+                To:
+                  type: number
+                  description: 'Maximum child age of the occupancy restriction.'
+                  example: 9
+            LimitedByAgeRange:
+              type: boolean
+              description: 'If true, indicates if child limits are restricted by age range.'
+              example: false
+            QuantityAllowed:
+              type: number
+              description: 'Total number of children allowed in a room type.'
+              example: 2
+      Class:
+        type: object
+        properties:
+          Code:
+            type: string
+            description: 'GDS room class'
+            example: A
+          Description:
+            type: string
+            description: 'GDS room class description'
+            example: Deluxe
+      Description:
+        type: string
+        description: 'Description of the room (supports translation)'
+        example: 'Deluxe Room'
+      DetailedDescription:
+        type: string
+        description: 'Detailed description of the room (supports translation)'
+        example: 'Deluxe, Air Conditioning, Digital Cable TV, Wireless Internet Access, Minibar, Bathroom with hair drier, Balcony, WorkDesk, and Digital Safe'
+      ExtraBed:
+        type: object
+        properties:
+          Allowed:
+            type: boolean
+            description: 'If true, indicates extra beds can be added to the room.'
+          Cost:
+            type: number
+            description: 'Cost associated with adding an extra bed.'
+            example: 15
+      FeatureList:
+        type: array
+        items:
+          type: object
+          properties:
+            CategoryCode:
+              type: string
+              description: 'Code associated to the room feature category.'
+              example: SAFETY
+            Id:
+              type: string
+              description: 'Id of the feature'
+              example: 91050
+            Description:
+              type: string
+              description: 'Description of the feature'
+              example: 'Width/diameter of elevator clear door opening space'
+            OtaCode:
+              type: integer
+              description: 'OTA code associated to the feature'
+              example: 9601
+            OtaType:
+              type: string
+              description: 'OTA code type.'
+              example: PHY
+            SortOrder:
+              type: integer
+              description: 'Sort order associated to the feature'
+              example: 2
+            UnitOfMeasurement:
+              type: string
+              description: 'Unit of measure for the feature.'
+              example: inches
+            Value:
+              type: integer
+              description: 'Value for the UnitofMeasurement'
+              example: 28
+      GuestLimit:
+        type: object
+        properties:
+          Adults:
+            type: integer
+            description: 'Maximum number of adult guests allowed for the room type'
+            example: 4
+          Children:
+            type: integer
+            description: 'Maximum number of children allowed for this room type'
+            example: 3
+          ChildrenIncluded:
+            type: boolean
+            description: 'Indicates if children are included in the maximum allowed guests for the room type'
+            example: false
+          GuestLimitTotal:
+            type: integer
+            description: 'Total number of guests allowed for the room type'
+            example: 4
+      ImageList:
+        $ref: '#/definitions/Images'
+      Size:
+        type: object
+        properties:
+          Max:
+            type: number
+            description: 'Maximum room size'
+            example: 360
+          Min:
+            type: number
+            description: 'Minimum room size'
+            example: 340
+          Units:
+            type: string
+            description: 'Unit of room measurement'
+            example: SquareFeet
+            enum:
+              - SquareFeet
+              - SquareMeters
+      ViewList:
+        type: array
+        items:
+          type: object
+          properties:
+            Code:
+              type: string
+              description: 'View code associated to the room'
+              example: 20780
+            Description:
+              type: string
+              description: 'Descriptive information about the room view'
+              example: 'Beach view'
+            OtaCode:
+              type: integer
+              description: 'OTA code value of the room view'
+              example: 780
+            OtaType:
+              type: string
+              description: 'OTA code type'
+              example: RMV
+            OtaReferenceCode:
+              type: string
+              description: 'OTA reference code'
+              example: RMV
+            IsGDSPreferred:
+              type: boolean
+              description: 'If true, indicates that the room view is used by a GDS'
+              example: true
+  Paging:
+    type: object
+    properties:
+      Size:
+        type: integer
+        description: 'Number of records to be returned in the response (0 = return all)'
+        example: 50
+      Start:
+        type: integer
+        description: 'Starting record to be returned in the response'
+        example: 0
+      Total:
+        type: integer
+        example: 146
+        description: 'Total number of records'
+  ErrorResponse:
+    properties:
+      ErrorCode:
+        type: string
+        example: 'Error Code'
+        description: 'Returns an application-specific code associated with the error.'
+      Message:
+        type: string
+        example: InvalidChainId
+        description: 'Returns an application-specific message associated with the error.'
+      TimeStamp:
+        type: string
+        format: date-time
+        example: '2018-12-1T18:25:43.511Z'
+        description: 'Timestamp when the message was processed.'
