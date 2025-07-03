@@ -21,4 +21,25 @@ window.onload = function() {
   });
 
   //</editor-fold>
+
+// START of new code to change the label
+  // Give Swagger UI a moment to render the top bar
+  setTimeout(() => {
+    const selectorLabel = document.querySelector('.scheme-container label');
+    if (selectorLabel && selectorLabel.innerText === 'Select a definition') {
+      selectorLabel.innerText = 'Select a Product'; // Your desired new label
+    }
+    // Alternatively, if the above doesn't work or for more general cases,
+    // you might need to target the dropdown directly.
+    // const dropdownParent = document.querySelector('.topbar-wrapper .scheme-container');
+    // if (dropdownParent) {
+    //   const oldLabel = dropdownParent.querySelector('label');
+    //   if (oldLabel) {
+    //     oldLabel.innerText = 'Select Your API:';
+    //   }
+    // }
+  }, 100); // A small delay to ensure the element exists
+  // END of new code to change the label
 };
+
+
