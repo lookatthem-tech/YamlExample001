@@ -2,24 +2,52 @@ swagger: '2.0'
 info:
   description: |
     The Hotel Content APIs provide several different ways to search for a list of hotels and to retrieve associated static descriptive content.
-    |
-    ## Overview of the Payment Processing API
+    
+    ### What is it?
+    Robust descriptive information can be retrieved from the SynXis Platform using the Hotel Details or Hotel List methods.
 
-    This API allows you to securely process payments, manage transactions, and
-    retrieve payment-related data. Our payment gateway ensures high security
-    standards and compliance.
+     * Hotel Details returns content for a single hotel.
+     * Hotel List returns content for multiple hotels.
 
-    **Key Features:**
-    * Create and manage payments
-    * Handle refunds and disputes
-    * Retrieve transaction history
+    ### Why use it?
+    Use the Hotel Details or Hotel List methods during the shopping and booking process to inform a guest about the detailed information about a hotel and answer questions they may have about the property.
 
-    <div style="background-color: #e6f7ff; border-left: 5px solid #0056b3; padding: 10px; margin-top: 20px;">
-        **Important Note:** All API calls require authentication using an API key.
-        Please refer to the <a href="#/Authentication">Authentication</a> section for details.
-    </div>
+    ### How to use
+    The responses between the two methods are identical with the only exception is the number of hotels.
 
-    If you have any questions, please contact our support team.
+    ### Hotel Details
+    GET https://[environment]/v1/api/hotel/{{hotel_Id}}/details Search for a single hotel.
+    
+    ### Hotel List
+    GET https://[environment]/v1/api/hotel/list Search for multiple hotels using one of these methods:
+
+    * Address - city, state, postal code, country
+    * Destination - destination id that is defined in SynXis Control Center
+    * Id - one or more hotel ids
+    * Amenity - standalone search method or used in combination with any of the above options
+ 
+    #### Request Additional Content
+    Additional Information can be returned in the response using the parameter @include and setting any of the supported values:
+
+    * Attributes: Return a list of attributes for the hotel.
+    * ChannelProperties: Returns Channel properties of the hotel.
+    * ContactInfo: Return the contact information for the hotel.
+    * Currency: Return the default currency for the hotel.
+    * DiningOptions: Return a list of dining options for the hotel.
+    * Features: Return a list of property features for the hotel.
+    * HotelGroups: Return a list of Chains and Brands associated to the hotel.
+    * Images: Return a property level hotel image.
+    * Languages: Return a list of languages the hotel supports.
+    * LocationInfo: Return address, latitude/longitude and time zone information for the hotel.
+    * MealPlans: Return a list of meal plans for the hotel.
+    * MediaLibraryImages: Return the library of images.
+    * Messages: Return the messages and alerts.
+    * PaymentMethods: Return a list of payment methods the hotel supports.
+    * Recreations: Return a list of recreation information for the hotel.
+    * ReferencePoints: Return a list of reference points near the hotel.
+    * Services: Return a list of services for the hotel.
+    * Tier: Return the Hotel Tier Definition.
+    * Transportation: Return a list of Transportation for the hotel.
 
   version: 1.0.0
   title: 'Hotel Content'
