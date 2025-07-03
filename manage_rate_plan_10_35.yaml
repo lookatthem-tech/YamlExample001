@@ -1,0 +1,884 @@
+swagger: '2.0'
+info:
+  description: Manages rate plans in the SynXis CR for a specified hotel.
+  version: "1.0"
+  title: Manage Rate Plan
+
+schemes:
+ - https
+host: services-c1.synxis.com
+basePath: /v1/api
+x-basePath: /api/v1.0
+
+securityDefinitions:
+  oauth2_authentication:
+    type: oauth2
+    tokenUrl: https://services-c1.synxis.com/v1/gwauth/token?grant_type=client_credentials&source_ip=127.0.0.1&business_context=WBSVC&user_type=Hotel
+    flow: application
+    x-base64-encode-client-credentials: true
+security:
+  - oauth2_authentication: []
+
+produces:
+- application/json
+  
+tags:
+  - name: Search
+paths:
+  /admin/product/ratePlans/:
+      post:
+        tags:
+          - Manage Rate Plan
+        summary: Creates or Updates a Rate or Group
+        operationId: manageRatePlan
+        parameters:
+          - name: request
+            in: body
+            required: true
+            schema:
+              $ref: '#/definitions/ManageRatePlan'
+        responses:
+          '200':
+            description: Ok
+          default:
+            description: Error
+            schema:
+              $ref: '#/definitions/ErrorResponse'
+  /admin/product/ratePlan/:
+      delete:
+        tags:
+          - Delete Rate Plan
+        summary: Delete Rate or Group
+        operationId: deleteRatePlan
+        parameters:
+          - name: request
+            in: body
+            required: true
+            schema:
+              $ref: '#/definitions/DeleteRatePlan'
+        responses:
+          '200':
+            description: Ok
+          default:
+            description: Error
+            schema:
+              $ref: '#/definitions/ErrorResponse'
+
+definitions:
+  Attribute:
+    description: Attributes are specific configurations that applies to a rate or group
+    properties:
+      accrual:
+        type: boolean
+        description: If true, indicates that the rate is eligible for the accrual of loyalty points.
+        example: false
+      allowSingleUseCreditCards:
+        type: boolean
+        description: If true, indicates that the rate allows single use credit card
+        example: false  
+      bestOnlyRatesExcluded:
+        type: boolean
+        description: If true, indicates that the rate is excluded from best only product shopping results.
+        example: false
+      barApplies:
+        type: boolean
+        description: If true, indicates that the rate applies to BAR.
+        example: false
+      breakfastIncluded:
+        type: boolean
+        description: If true, indicates that breakfast is included in the rate.
+        example: true
+      commissionable:
+        type: boolean
+        description: Indicates that commissionable policy applies. This will be set to active (true) when rate commission policy code is specified.
+        example: false
+      controlledLocallyOnly:
+        type: boolean
+        description: If true, indicates that the rate can only be managed in the CR.
+        example: false
+      credentialRequired:
+        type: boolean
+        description: If true, indicates that credential is required for this rate.
+        example: false
+      excludeFromAvailRatesPush:
+        type: boolean
+        description: If true, indicates that the rate should be excluded from the Availability, Rates and Inventory Push to OTAs and partners.
+        example: true
+      isMandatory:
+        type: boolean
+        description: If true, indicates the hotel must offer this rate. When a rate is set to mandatory at chain or brand level the value is pushed down to hotel level.
+        example: false
+      isNegotiated:
+        type: boolean
+        description: If true, indicates that the rate is a corporate negotiated rate.
+        example: false
+      lastRoomAvailable:
+        type: boolean
+        description: If true, indicates that the rate plan will remain open as long as there is room inventory available at the property.
+        example: false
+      managedBookingPolicy:
+        type: boolean
+        description: If true, indicates that booking or guarantee policy will be managed in CRS.
+        example: false  
+      managedCancelPolicy:
+        type: boolean
+        description: If true, indicates that cancellation policy will be managed in CRS.
+        example: false  
+      managedRateSeason:
+        type: boolean
+        description: If true, indicates that seasonal rates will be managed in CRS.
+        example: false       
+      mapAsNegotiatedRateGDSIDS:
+        type: boolean
+        description: If true, indicates that the rate should be considered confidential in the GDS/IDS.  Suggest use is for Channel Connect Public rates that you want to sell as a Negotiated Rate in the GDS/IDS.
+        example: false
+      redeemable:
+        type: boolean
+        description: (Deprecated) If true, indicates that the rate is eligible for loyalty point redemption.
+        example: false
+      restrictPricingUpdate:
+        type: boolean
+        description: If true, indicates that only users with specific access can edit the rate.
+        example: true
+      secondaryRateNotAllowed:
+        type: boolean
+        description: If true, indicates that the rate is only available as primary in multiple rate reservations.
+        example: false
+      suppressed:
+        type: boolean
+        description: If true, indicates that the rate does not display price values during availability checks in the SynXis Booking Engine, SynXis Voice Agent or guest emails.
+        example: false
+      taxInclusiveByDefault:
+        type: boolean
+        description: If true, indicates that taxes are included in the rate for all room types.
+        example: false
+      useProductAllocation:
+        type: boolean
+        description: If true, indicates that the rate uses product allocation or merchant flag is on.
+        example: false
+      restrictInPropertyHub:
+        type: boolean
+        description: If true, indicates that rate is restricted for channel PMS, only user with specific access can edit this rate.
+        example: false
+        
+  CompanyProfile:
+    description: Company profile assignment
+    type: object
+    properties:
+      Chain:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Unique ID that identifies a hotel chain or management group in SynXis
+            example: 1000
+      CompanyProfileList:
+        type: array
+        description: Company profile assignment
+        items:
+            properties:
+              code:
+                  type: string
+                  description: Code to identify company profile.
+                  example: Sabre
+              action:
+                  type: string
+                  description: Indicates to add/edit or delete the company profile assignments for given rate.
+                  enum:
+                  - AddEdit
+                  - UnAssign 
+              level:
+                  type: string
+                  description: Indicates chain/hotel company profile level for group rate.
+                  enum:
+                  - Chain
+                  - Hotel 
+  ContactAddress:
+    description: Group Contact Address Information
+    properties:
+      addressLine:
+        type: array
+        items:
+          type: string
+          description: Street-related information associated with an address.
+          example: "123 Main St."
+          maximum: 60
+      city:
+        type: string
+        description: City associated with an address.
+        example: "Denver"
+        maximum: 60
+      country:
+        description: Country
+        properties:
+          code:
+            type: string
+            description: The ISO 1366-1 country code.
+            example: US
+      postalCode:
+        type: string
+        description: Postal code associated with an address.
+        example: "80012"
+        maximum: 10
+      stateProv:
+        description: State or Province
+        properties:
+          code:
+            type: string
+            description: State or Province Code
+            example: CO
+  Criteria:
+    description: Criteria specifies the group/rate code and hotel identifier 
+    type: object
+    properties:
+      code:
+        type: string
+        description: Code that uniquely identifies a rate or group.
+        example: grpRt
+        maximum: 20
+      hotel:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Code that uniquely identifies a single hotel property in Control Center.
+            example: 13098
+      chain:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Code that uniquely identifies a single chain in Control Center.
+            example: 8001027
+      brand:
+        type: object
+        properties:
+          id:
+            type: integer
+            description: Code that uniquely identifies a single brand in Control Center.
+            example: 8002801
+      id:
+        type: string
+        description: ID that uniquely identifies a rate or group
+        example: "112413B0-1C0B-42A9-B677-72CE18F05E35"
+      type:
+        type: string
+        description: Indicates the rate type (default rate or group)
+        example: Default
+        enum:
+        - Default
+        - Group
+        - ChainRate
+        - BrandRate
+    required:
+      - code
+      
+  DeleteRatePlan:
+    description: Contains information about a rate or group to delete.
+    type: object
+    properties:
+      code:
+        type: string
+        description: Code that uniquely identifies a rate or group.
+        example: grpRt
+        maximum: 20
+      hotelid:
+        type: integer
+        description: Code that uniquely identifies a single hotel property in Control Center.
+        example: 13098
+        
+  ErrorResponse:
+    properties:
+      errorCode:
+        type: string
+        example: Error Code
+        description: Returns an Application-specific code associated with the error.
+      message:
+        type: string
+        example: InvalidHotel
+        description: Returns an Application-specific message associated with the error.
+      timeStamp:
+        type: string
+        format: date-time
+        example: '2021-12-10T18:25:43.511Z'
+        description: Timestamp when the message was processed.
+      warnings:
+        type: array
+        example: [warrning message, warrning message]
+        description: Returns a list of Application-specific messages associated with warrnings.
+        items:
+          type: string 
+
+  GroupHeader:
+    description: Group Header is an information specific to a particular group
+    properties:
+      alias:
+        type: string
+        description: Alternate name for a group that callers may use when contacting a call center to make a reservation.  Multiple words should be separated by commas.
+        example: SmithWedding
+        maximum: 400
+      bookingMethodCode:
+        type: string
+        description: Booking Method
+        example: META
+        maximum: 8
+      contactID:
+        type: string
+        description: Contact unique identifier
+        example: C6E50D08-38BD-45CD-A201-C3C9B10B7RFD
+      externalCateringCode:
+        type: string
+        description: External Catering
+        maximum: 80
+        example: RC3
+      statusFollowupDate:
+        type: string
+        format: date-time
+        example: '2021-12-10T18:25:43.511Z'
+        description: Date to followup with customer
+
+  GroupContactInfo:
+    description: Group Contact Information
+    required:
+        - firstName
+        - lastName
+        - email
+    properties:
+      contactAddress:
+        $ref: '#/definitions/ContactAddress'
+      email:
+        type: string
+        description: Email address of the contact.
+        example: 'larry.walker@email.com'
+        maximum: 250
+      fax:
+        type: string
+        description: Fax number
+        example: '555-123-4567'
+        maximum: 20
+      firstName:
+        type: string
+        description: Given Name / First Name of the contact.
+        example: Larry
+        maximum: 40
+      lastName:
+        type: string
+        description: Surname/Last name of the contact.
+        example: Walker
+        maximum: 40
+      middleInitial:
+        type: string
+        description: Middle initial of the contact.
+        example: Mc
+        maximum: 2
+      namePrefix:
+        type: string
+        description: Name Prefix
+        example: Mr.
+      primaryPhone:
+        type: string
+        description: Primary Phone
+        example: '555-123-1234'
+        maximum: 25
+      secondaryPhone:
+        type: string
+        description: Secondary Phone
+        example: '555-123-1235'
+        maximum: 25
+      url:
+        type: string
+        description: Url or website address
+        example: 'https://mywebsite.com/'
+        maximum: 120
+
+  GroupSource:
+    description: Group Source 
+    type: object
+    properties:
+      channelCode:
+        type: string
+        description: Code that uniquely identifies a group source channel
+        example: G360
+  GroupStatus:
+    description: Updates a Group status and block allocation(s)
+    type: object
+    properties:
+      status:
+        type: string
+        description: |
+          Used to set the desired state of the group plan code (i.e. Confirmed).
+          - `Confirmed`: Can only update a CheckedIn or Cancelled status.
+          - `Tentative`: Can only update a Confirmed or Cancelled status.
+          - `Cancel`: Can update any status but not able change the status from Cancel once set.
+          - `Closed`: Can update any status but not able change the status from Closed once set.
+          - `CheckedIn`: Can only update a CheckedOut status.
+          - `CheckedOut`: Can only update a CheckedIn or Closed status.
+          - `Lost`: Can only be set from a Tentative or Hold status.
+          - `Hold`: Can only be set when creating a new group
+        enum:
+        - Confirmed
+        - Tentative
+        - Cancel
+        - CheckedIn
+        - CheckedOut
+        - Closed
+        - Lost
+        - Hold
+        example: 'Tentative'
+      CancelReason:
+        type: object
+        properties:
+          code:
+            type: string
+            description: A unique code to identify the cancellation reason.  This field is required if updating @status to ```Cancel```.
+            example: 'CXLOne'
+            maximum: 20
+         
+  Header:
+    description: Header contains information that is common to both rates and groups.
+    properties:
+      active:
+        type: boolean
+        description: If true, indicates that the rate is Active. 
+        example: true   
+      categoryCode:
+        type: string
+        description: Code associated with a rate category.
+        example: NEG
+        maximum: 17
+      class:
+        type: string
+        description: Rate type class
+        enum:
+          - Unassigned
+          - Association
+          - Convention
+          - Corporate
+          - Family
+          - Government
+          - Military
+          - Negotiated
+          - Package
+          - Promotional
+          - Rack
+          - Senior
+          - TravelIndustry
+          - Weekend
+      rateTypeUse:
+        type: string
+        description: rateTypeUse identifies a Daily Rate (Default), Complimentary or House Use Rate.
+        enum:
+          - DailyRate
+          - Complimentary
+          - HouseUse
+      code:
+        type: string
+        description: Use this attribute to change the rate or group code from the original value in the ```@Criteria``` node.
+        example: grpRt2
+        maximum: 20
+      redemptionType:
+        type: string
+        description: redemptionType identifies a rate redemption type. This only applies to Daily rate. For BAR rate type, PointsandCashUsingHotelTiers and PointsOnlyUsingHotelTiers redemption types do not apply.   
+        enum:
+          - NonRedeemable
+          - PointsandCashUsingHotelTiers
+          - PointsOnlyUsingHotelTiers
+          - PointsorCashUsingPointsConversions
+          - PointsOnlyUsingPointsConversions
+      pointAndCashLevel:
+        type: string
+        description: pointAndCashLevel indentifies the Point and cash Level code
+        example: 5PCT
+        maximum: 22
+      currencyCode:
+        type: string
+        description: ISO 4217 three alpha currency code.
+        example: USD
+        maximum: 3
+      longDescription:
+        type: string
+        description: Detailed information about the rate or group (Default).
+        example: If group book is used, call meeting organizer Mr. Amorim 555 634 8146.
+        maximum: 1000
+      name:
+        type: string
+        description: Name of the rate or group (Default).
+        example: Smith Wedding
+        maximum: 70
+      pmsCode:
+        type: string
+        description: Code used by a Property Management System to identify a rate.
+        example: SMITH1
+        maximum: 22
+      pmsGroupCode:
+        type: string
+        description: Code used by a Property Management System to identify a group.
+        example: SMITHWED
+        maximum: 17
+      shortDescription:
+        type: string
+        description: Information about the rate or group (Default).
+        example: Wedding party.
+        maximum: 94
+      specialInstructions:
+        type: string
+        description: Special Instructions.
+        example: Group would like all rooms on the same floor.
+        maximum: 1000
+
+  ManageRatePlan:
+    description: Manage rate plan applies to both rate or group
+    type: object
+    properties:
+      Attributes:
+        $ref: '#/definitions/Attribute'
+      BookingPolicy:
+        type: object
+        properties:
+          code:
+            type: string
+            description: Code associated to a booking policy.
+            example: GUA
+      CancelPolicy:
+        type: object
+        properties:
+          code:
+            type: string
+            description: Code associated with a cancel policy.
+            example: 1D
+      ChannnelList:
+        description: Rate channel assignment 
+        type: array
+        items:
+          properties:
+            code:
+              type: string
+              description: SynXis CR booking channel code. For channel connect (SYDC) specify the secondary channel e.g. AGODA
+              example: WEB
+            confidential:
+              description: If true, indicates that the rate is confidential for the channel.
+              type: boolean
+              example: true
+            action:
+              type: string
+              description: Indicates to Add/Edit or Un-Assign a channel
+              enum:
+              - AddEdit
+              - UnAssign
+      CommissionPolicy:
+        type: object
+        properties:
+          code:
+            type: string
+            description: Code associated with a commission policy.
+            example: CP
+      CompanyProfile:
+        $ref: '#/definitions/CompanyProfile'
+
+      ControlTypeList:
+        description: Rate stay control type assignment 
+        type: array
+        items:
+          properties:
+            type:
+              type: string
+              description: Takes the stay control type applicable for the rate.
+              example: MinimumStayThrough
+              enum:
+                - IsClosed
+                - NoArrival
+                - NoDeparture  
+                - MinimumStayArrive  
+                - MinimumStayThrough  
+                - MaximumStayArrive  
+                - MaximumStayThrough  
+                - LeadDays  
+                - StartTime
+                - EndTime  
+                - SameDay  
+                - MaxSellDate  
+                - SellThreshold
+                - SellLimit
+                - FullPatternLengthOfStayArrival
+                - MaximumLeadDays
+                - MinSellDate
+                - TotalHotelSellThreshold
+                - NoSellDay
+                - Suspended
+                - SeasonalClosure
+                - ByRequestOnly
+                - ChildMinimumRoomOccupancy
+                - AdultMinimumRoomOccupancy
+      Criteria:
+        $ref: '#/definitions/Criteria'
+      GroupHeader:
+        $ref: '#/definitions/GroupHeader'
+      GroupContactInfo:
+        $ref: '#/definitions/GroupContactInfo'
+      GroupPaymentMethod:
+        type: object
+        properties:
+          type:
+            type: string
+            description: Payment method available for booking a reservation for this group block.  This content only applies to SynXis Property Hub.
+            enum:
+            - Cash
+            - Check
+            - CreditCard
+            - DirectBill
+          Payments:
+            type: array
+            items:
+              properties:
+                 type:
+                   type: string
+                   description: Specifies the type of a payment method.
+                   enum:
+                   - Cash
+                   - Check
+                   - CreditCard
+                   - DirectBill
+                 Primary:
+                    type: boolean
+                    description: If true, indicates the payment guarantee is primary.
+                    example: true  
+                 DirectBill:
+                   type: object  
+                   properties:
+                     AccountNumber:
+                       type: string
+                       description: An account number associated with the direct billing.
+                       example: "8365920440"
+                     ProjectNumber:
+                       type: string
+                       description: Project number associated with the direct billing.
+                       example: "112234"             
+                 PaymentCard:
+                    $ref: '#/definitions/PaymentCardModel'
+      Header:
+        $ref: '#/definitions/Header'
+      Hurdle:
+        type: object
+        properties:
+          code:
+            type: string
+            description: Code that uniquely idenfies a rate plan to be used as yielding rate. This requires that hotel attribute to use hurdling is active. 
+            example: Rt101       
+      IndividualPaymentMethod:
+        type: object
+        properties:
+          type:
+            type: string
+            description: |
+              Use this setting to determine who pays for specific charges related to group bookings.  This content only applies to SynXis Property Hub. 
+              - `GroupPaysAll`: An individual guest credit card is not required when booking a reservation unless the Guarantee or Deposit Policy includes that requirement. When a credit card is included, no payment is processed on that credit card.  Routing codes configured in SynXis Property Hub display for the group.
+              - `GroupPaysNone`: Group Pays None – An individual guest credit card is required when booking a reservation if dictated by the hotel’s Guarantee or Deposit Policy.
+              - `GroupPaysSome`: An individual guest credit card is required when booking a reservation if dictated by the Guarantee or Deposit Policy.  Routing codes configured in SynXis Property Hub display for the group.
+            enum:
+            - GroupPaysAll
+            - GroupPaysNone
+            - GroupPaysSome
+      Translations:
+        type: array
+        items:
+          $ref: '#/definitions/Translation'  
+      MarketSegment:
+        $ref: '#/definitions/MarketSegment'
+      MarketSource:
+        $ref: '#/definitions/MarketSource'
+      RoutingList:
+        type: array
+        items:
+          $ref: '#/definitions/RoutingCode'  
+      SalesManager:
+        $ref: '#/definitions/SalesManager'
+      GroupStatus:
+        $ref: '#/definitions/GroupStatus'
+      TaxList:
+        $ref: '#/definitions/TaxList'
+      PackageList:
+        $ref: '#/definitions/PackageList'
+      GroupSource:
+        $ref: '#/definitions/GroupSource'
+
+  MarketSegment:
+    description: Market segment 
+    type: object
+    properties:
+      code:
+        type: string
+        description: Code that uniquely identifies a market segment
+        example: LEISURE
+        maximum: 7
+  MarketSource:
+    description: Market Source 
+    type: object
+    properties:
+      code:
+        type: string
+        description: Code that uniquely identifies a market source
+        example: REFERRAL
+        maximum: 20
+
+  PackageList:
+    type: array
+    description: List of Package to assign or unassign
+    items:
+      properties:
+        code:
+          type: string
+          description: Code to identify the Package.
+          example: pkg
+        action:
+          type: string
+          description: Indicates to add/edit or delete the Package. If not included in the request the default action is AddEdit.
+          enum:
+          - AddEdit
+          - UnAssign
+      required:
+        - code
+         
+  RoutingCode:
+    description: Routing Code Assignment
+    type: object
+    properties:
+      folioNumber:
+        type: string
+        description: Folio Number
+        example: '01'    
+      routingCode:
+        type: string
+        description: Code that uniquely identifies a routing code assignment
+        example: ABA
+        maximum: 20
+
+  SalesManager:
+    description: Sales Manager Contact Information
+    properties:
+      contactAddress:
+        $ref: '#/definitions/ContactAddress'
+      email:
+        type: string
+        description: Email address of the contact.
+        example: 'larry.walker@email.com'
+        maximum: 250
+      fax:
+        type: string
+        description: Fax number
+        example: '555-123-4567'
+        maximum: 20
+      firstName:
+        type: string
+        description: Given Name / First Name of the contact.
+        example: Larry
+        maximum: 40
+      lastName:
+        type: string
+        description: Surname/Last name of the contact.
+        example: Walker
+        maximum: 40
+      middleInitial:
+        type: string
+        description: Middle initial of the contact.
+        example: W
+        maximum: 1
+      namePrefix:
+        type: string
+        description: Name Prefix
+        example: Mr.
+      primaryPhone:
+        type: string
+        description: Primary Phone
+        example: '555-123-1234'
+        maximum: 25
+      secondaryPhone:
+        type: string
+        description: Secondary Phone
+        example: '555-123-1235'
+        maximum: 25
+      url:
+        type: string
+        description: Url or website address
+        example: 'https://mywebsite.com/'
+        maximum: 120
+
+  TaxList:
+    type: array
+    description: List of tax to assign or unassign
+    items:
+      properties:
+        code:
+          type: string
+          description: Code to identify the tax.
+          example: ServiceTax
+        action:
+          type: string
+          description: Indicates to add/edit or delete the tax.
+          enum:
+          - AddEdit
+          - UnAssign
+      required:
+        - code          
+
+  Translation:
+    description: Contains translated/channelized content for the rate or group.
+    properties:
+      Channel:
+        type: object
+        properties:
+          code:
+            type: string
+            description: SynXis CR booking channel code. For channel connect (SYDC) specify the secondary channel e.g. AGODA
+            example: WEB
+      Language:
+        type: object
+        properties:
+          code:
+            type: string
+            description: Language code with an optional culture code.
+            example: "fr-FR"
+            maximum: 5
+            minimum: 2
+      longDescription:
+        type: string
+        description: Detailed information about the rate or group.
+        example: "Si un livre de groupe est utilisé, appeler l'organisateur de la réunion M. Amorim 555 634 8146"
+        maximum: 1000
+      name:
+        type: string
+        description: Name of a rate or group.
+        example: Mariage Smith
+        maximum: 70
+      shortDescription:
+        type: string
+        description: Information about the rate or group.
+        example: Mariage
+        maximum: 94
+
+  PaymentCardModel:
+    type: object
+    properties:
+      CardCode:
+        type: string
+        description: Code of the payment card.
+        example: VI
+      CardNumber:
+        type: string
+        description: Number of a payment card.
+        example: "4111111111111111"
+      ExpireDate:
+        type: string
+        description: Expiration date of a payment card.
+        example: "1229"
+      CardHolder:
+        type: string
+        description: Specifies payment card holder's name.
+        example: Guest Name
+      Token:
+        type: string
+        description: Token number associated with the payment card.
+        example: "cjzHiunsdfjnkkIbgoinN"
+      ConsentToStoreCardData:
+        type: boolean
+        description: Indicates consent to store payment card data.
+        example: false
