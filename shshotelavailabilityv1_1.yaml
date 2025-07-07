@@ -9,8 +9,8 @@ info:
    ### Why use it?
    Use to request a hotel availability response that includes either: 
 
-   A list of products matching the search criterion. Products display available status, pricing, booking policy rules, restrictions, inventory, images, descriptions, and policies. Shoppers use that data to determine which offering meets their needs. 
-   Or, when any of the matching products is not available, a least restrictive failure is returned indicating why the product is not available. This indicator identifies the reason there is no availability based on the request. Shoppers can modify their availability request to address the failure and enter it to view the response again.
+   * A list of products matching the search criterion. Products display available status, pricing, booking policy rules, restrictions, inventory, images, descriptions, and policies. Shoppers use that data to determine which offering meets their needs. 
+   * Or, when any of the matching products is not available, a least restrictive failure is returned indicating why the product is not available. This indicator identifies the reason there is no availability based on the request. Shoppers can modify their availability request to address the failure and enter it to view the response again.
 
    ### How to use
    Supported use cases: 
