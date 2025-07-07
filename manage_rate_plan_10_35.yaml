@@ -38,6 +38,8 @@ info:
 
     ### How to use
     Create or update a rate or group rate:
+    
+    
     POST /admin/product/ratePlans
 
     ```
@@ -48,7 +50,7 @@ info:
         "example": "example",
         "example": "example",
         "example": "example",
-        }
+      }
     ```
 
 
