@@ -35,6 +35,24 @@ info:
     * DiningOptions: Return a list of dining options for the hotel.
     * Features: Return a list of property features for the hotel.
 
+
+    ### How to use
+    Create or update a rate or group rate:
+    POST /admin/product/ratePlans
+
+    ```
+      {
+        "example": "example",
+        "example": "example",
+        "example": "example",
+        "example": "example",
+        "example": "example",
+        "example": "example",
+        }
+      ```
+
+
+
   version: "1.0"
   title: Manage Rate Plan
 
