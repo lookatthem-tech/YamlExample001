@@ -50,10 +50,8 @@ info:
     * Tier: Return the Hotel Tier Definition.
     * Transportation: Return a list of Transportation for the hotel.
 
-    <blockquote>
-      Note: Multiple selections can be requested using a comma as a delimiter (i.e. include=Attributes,DiningOptions,Features)
-    </blockquote>
-
+    **Note:** Multiple selections can be requested using a comma as a delimiter (i.e. include=Attributes,DiningOptions,Features)
+    
     Sample response:
 
     ```
