@@ -15,25 +15,25 @@ info:
    ### How to use
    Supported use cases: 
 
-   Access Codes - Include Corporate, Group, Promotion of Channel Access Rates in the availability response. The response is almost identical in terms of structure to the unqualified search but it includes more products since the access code unlocks the usage of additional products.
-   Additional Guests - Request pricing for a specified number of guests and also include pricing for additional guests. This is helpful when the number of guests is not finalized.
-   Agent - Booker, Travel Agent or Chain Agent Specific Rates - Unlock rates assigned to a Booker, IATA or Chain Agent
-   Central Reservation Office (CRO) Rates - Search for rates assigned to a CRO
-   Coupon Codes - Include one or more coupon codes to identify which rates are eligible.
-   Currency Code - Request rates set up in an alternate currency Note: Only rates set up in the requested currency are returned. Rate currency is not converted.
-   Future Booking Date - Simulate how shopping would behave if today was the booking date. This type of search can be useful to check availability for date-based promotions that have a start date in the future.
-   Language - Request the hotel name and other descriptive information to be returned in a specified language Note: If content doesn’t exist in the requested language or isn't supported by the system then the default language English (en) is used.
-   Loyalty Program - Request rates based on loyalty program code and level
-   Pagination - Used to access the response data in smaller sets
-   Price Range - Request rates by specifying a minimum and/or maximum price
-   Rate - Request specific rate codes to include in the response
-   Rate Class - Include or exclude rates assigned to a rate class
-   Rate Filter - Request specific rate codes associated to a rate filter
-   Return Full Content - In addition to pricing and availability, descriptive content can be included in the response
-   Room Code - Request specific room codes to include in the response
-   Room Class - Include or exclude rooms that are ADA Compliant
-   Room Feature - Include rooms associated with a specific room feature (i.e. Pet-friendly room)
-   Room View - Include rooms associated with a specific view (i.e. Beach view)
+   * Access Codes - Include Corporate, Group, Promotion of Channel Access Rates in the availability response. The response is almost identical in terms of structure to the unqualified search but it includes more products since the access code unlocks the usage of additional products.
+   * Additional Guests - Request pricing for a specified number of guests and also include pricing for additional guests. This is helpful when the number of guests is not finalized.
+   * Agent - Booker, Travel Agent or Chain Agent Specific Rates - Unlock rates assigned to a Booker, IATA or Chain Agent
+   * Central Reservation Office (CRO) Rates - Search for rates assigned to a CRO
+   * Coupon Codes - Include one or more coupon codes to identify which rates are eligible.
+   * Currency Code - Request rates set up in an alternate currency Note: Only rates set up in the requested currency are returned. Rate currency is not converted.
+   * Future Booking Date - Simulate how shopping would behave if today was the booking date. This type of search can be useful to check availability for date-based promotions that have a start date in the future.
+   * Language - Request the hotel name and other descriptive information to be returned in a specified language Note: If content doesn’t exist in the requested language or isn't supported by the system then the default language English (en) is used.
+   * Loyalty Program - Request rates based on loyalty program code and level
+   * Pagination - Used to access the response data in smaller sets
+   * Price Range - Request rates by specifying a minimum and/or maximum price
+   * Rate - Request specific rate codes to include in the response
+   * Rate Class - Include or exclude rates assigned to a rate class
+   * Rate Filter - Request specific rate codes associated to a rate filter
+   * Return Full Content - In addition to pricing and availability, descriptive content can be included in the response
+   * Room Code - Request specific room codes to include in the response
+   * Room Class - Include or exclude rooms that are ADA Compliant
+   * Room Feature - Include rooms associated with a specific room feature (i.e. Pet-friendly room)
+   * Room View - Include rooms associated with a specific view (i.e. Beach view)
 
    Sample request and response (2 adults, 1 room, 1 night): 
    
@@ -47,7 +47,7 @@ info:
         "example": "example",
         "example": "example",
         "example": "example",
-        }
+      }
     ```
 
   version: '1.0'
