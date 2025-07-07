@@ -4,7 +4,7 @@ info:
     The Hotel Content APIs provide several different ways to search for a list of hotels and to retrieve associated static descriptive content.
 
     ### What is it?
-    Robust descriptive information can be retrieved from the SynXis Platform using the Hotel Details or Hotel List methods.
+    You can retrieve robust descriptive information from the SynXis Platform using the Hotel Details or Hotel List methods.
     
     * Hotel Details returns content for a single hotel.
     * Hotel List returns content for multiple hotels.
