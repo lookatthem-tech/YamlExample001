@@ -49,8 +49,7 @@ info:
         "example": "example",
         "example": "example",
         }
-      ```
-
+    ```
 
 
   version: "1.0"
